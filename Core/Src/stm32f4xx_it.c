@@ -42,6 +42,7 @@
 /* USER CODE END 0 */
 /* External variables --------------------------------------------------------*/
 /* USER CODE BEGIN EV */
+extern PCD_HandleTypeDef hpcd_USB_OTG_FS;
 /* USER CODE END EV */
 /******************************************************************************/
 /*           Cortex-M4 Processor Interruption and Exception Handlers          */
@@ -161,12 +162,50 @@ void SysTick_Handler(void)
 /* USER CODE BEGIN 1 */
 void DMA2_Stream5_IRQHandler(void)
 {
-
   if (DMA2->HISR & (1U << 11)) { // Check DMA2 Stream 5 Transfer Complete interrupt flag (TCIF5)
     DMA2->HIFCR = (1U << 11); // Clear flag
-    TIM1->CR1 &= ~TIM_CR1_CEN; // Stop timer
-    extern volatile uint8_t simulation_running;
-    simulation_running = 0;
+    
+    extern volatile uint8_t pingpong_mode_active;
+    if (pingpong_mode_active) {
+      extern volatile uint8_t pp_current_buf;
+      extern volatile uint8_t simulation_running;
+      extern uint8_t CDC_Transmit_FS(uint8_t *Buf, uint16_t Len);
+      extern void DDA_Start_PP(uint8_t buffer_idx);
+      extern volatile uint8_t pp_buf_ready[2];
+      extern volatile uint16_t current_play_ticks_left;
+      
+      pp_buf_ready[pp_current_buf] = 0;
+      
+      if (current_play_ticks_left >= 1000) {
+        current_play_ticks_left -= 1000;
+        if (current_play_ticks_left == 0) {
+          // Notify host that the 20ms segment finished
+          uint8_t done_msg = 'D';
+          CDC_Transmit_FS(&done_msg, 1);
+        }
+      }
+      
+      pp_current_buf = 1 - pp_current_buf;
+      
+      if (pp_buf_ready[pp_current_buf]) {
+        if (current_play_ticks_left == 0) {
+          current_play_ticks_left = 4000;
+        }
+        DDA_Start_PP(pp_current_buf);
+      } else {
+        TIM1->CR1 &= ~TIM_CR1_CEN;
+        simulation_running = 0;
+      }
+    } else {
+      TIM1->CR1 &= ~TIM_CR1_CEN; // Stop timer
+      extern volatile uint8_t simulation_running;
+      simulation_running = 0;
+    }
   }
+}
+
+void OTG_FS_IRQHandler(void)
+{
+  HAL_PCD_IRQHandler(&hpcd_USB_OTG_FS);
 }
 /* USER CODE END 1 */

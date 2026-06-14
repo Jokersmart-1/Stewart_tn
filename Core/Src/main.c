@@ -24,29 +24,14 @@
 #include "usb_otg.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "usb_device.h"
 /* USER CODE END Includes */
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-typedef struct {
-  GPIO_TypeDef *step_port;
-  uint16_t step_pin;
-  GPIO_TypeDef *dir_port;
-  uint16_t dir_pin;
-  GPIO_TypeDef *en_port;
-  uint16_t en_pin;
-  uint32_t accum;
-  uint32_t velocity;
-  uint32_t steps_total;
-  uint32_t steps_done;
-  uint8_t state_timer;
-  uint8_t dir;
-} AxisConfig_t;
 /* USER CODE END PTD */
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define NUM_AXES 6
-#define STEP_SCALE 65536U /* 16-bit DDA resolution */
-#define DMA_TICKS 4000U /* Logical DDA ticks per motion segment (20ms @ 5µs) */
+#define DMA_TICKS 1000U /* Logical DDA ticks per motion segment (5ms @ 5µs) */
 #define DMA_BUF_LEN (DMA_TICKS * 2) /* DMA entries: 2 per tick (RESET + SET phases) */
 /* USER CODE END PD */
 /* Private macro -------------------------------------------------------------*/
@@ -56,10 +41,7 @@ typedef struct {
 /* USER CODE BEGIN PV */
 AxisConfig_t axes[NUM_AXES];
 volatile uint8_t simulation_running = 0;
-uint32_t bsrr_portF[DMA_BUF_LEN];
-uint32_t bsrr_portG[DMA_BUF_LEN];
-uint32_t bsrr_portC[DMA_BUF_LEN];
-volatile uint32_t dma_ticks_used = 0;
+/* Dynamic sub-segment buffers and USB variables are defined in main_pingpong.c */
 /* USER CODE END PV */
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
@@ -67,10 +49,10 @@ void PeriphCommonClock_Config(void);
 /* USER CODE BEGIN PFP */
 void MX_TIM1_Init(void);
 void DDA_Init(void);
-void DDA_SetTarget(uint32_t target_steps[NUM_AXES]);
-void DDA_Start(void);
 void DMA_StepInit(void);
-void DDA_PreCompute(void);
+uint8_t USB_IsConnected(void);
+void CDC_Parse_Command(uint8_t *buf, uint32_t len);
+void CDC_Send_Status(void);
 /* USER CODE END PFP */
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
@@ -120,7 +102,7 @@ void DDA_Init(void) {
   axes[5].dir_pin = DIR5_Pin;
   axes[5].en_port = EN5_GPIO_Port;
   axes[5].en_pin = EN5_Pin;
-  /* Reset state for all axes */
+  /* Reset state for all axes and set step pins to HIGH (idle state for active-low) */
   for (int i = 0; i < NUM_AXES; i++) {
     axes[i].accum = 0;
     axes[i].velocity = 0;
@@ -128,97 +110,8 @@ void DDA_Init(void) {
     axes[i].steps_done = 0;
     axes[i].state_timer = 0;
     axes[i].dir = 0;
+    axes[i].step_port->BSRR = axes[i].step_pin; // Set step pin HIGH (idle)
   }
-}
-/**
- * @brief  Set target steps and compute DDA velocities for all axes.
- *         The dominant axis (max steps) runs at full speed (velocity =
- * STEP_SCALE). All others are proportionally scaled so they finish at the same
- * time.
- * @param  target_steps  Array of 6 absolute step counts
- */
-void DDA_SetTarget(uint32_t target_steps[NUM_AXES]) {
-  dma_ticks_used = 0;
-  /* Find dominant axis (max steps) */
-  uint32_t max_steps = 0;
-  for (int i = 0; i < NUM_AXES; i++) {
-    if (target_steps[i] > max_steps)
-      max_steps = target_steps[i];
-  }
-  if (max_steps == 0)
-    return;
-  /* Compute velocity for each axis to complete within a fixed 20ms duration
-   * (4000 ticks of 5us) */
-  for (int i = 0; i < NUM_AXES; i++) {
-    axes[i].steps_total = target_steps[i];
-    axes[i].steps_done = 0;
-    axes[i].accum = 0;
-    axes[i].state_timer = 0;
-    /* Use ceiling division to prevent rounding errors for small step counts */
-    axes[i].velocity =
-        (uint32_t)(((uint64_t)target_steps[i] * STEP_SCALE + 3999U) / 4000U);
-  }
-}
-/**
- * @brief  Enable motors, set DIR forward, and start TIM2 DDA.
- */
-/**
- * @brief  Enable motors, set DIR forward, and start TIM1 DDA.
- */
-void DDA_Start(void) {
-  if (dma_ticks_used == 0) {
-    simulation_running = 0;
-    return;
-  }
-  /* Enable all motors (EN LOW = active for A4988/TMC drivers) */
-  for (int i = 0; i < NUM_AXES; i++) {
-    axes[i].en_port->BSRR = (uint32_t)axes[i].en_pin << 16; /* EN LOW */
-  }
-  /* Set direction forward (DIR HIGH) */
-  for (int i = 0; i < NUM_AXES; i++) {
-    axes[i].dir_port->BSRR = axes[i].dir_pin; /* DIR HIGH = forward */
-  }
-  /* Brief delay for DIR setup time (>650ns for A4988) */
-  __NOP();
-  __NOP();
-  __NOP();
-  __NOP();
-  __NOP();
-  __NOP();
-  __NOP();
-  __NOP();
-  /* Configure DMA transfer counts and re-enable streams */
-
-  DMA2_Stream5->CR &= ~DMA_SxCR_EN;
-  DMA2_Stream1->CR &= ~DMA_SxCR_EN;
-  DMA2_Stream2->CR &= ~DMA_SxCR_EN;
-
-  while (DMA2_Stream5->CR & DMA_SxCR_EN);
-  while (DMA2_Stream1->CR & DMA_SxCR_EN);
-  while (DMA2_Stream2->CR & DMA_SxCR_EN);
-  /* Clear DMA flags */
-
-  DMA2->LIFCR = (0x3D << 6) | (0x3D << 16); // Stream 1 and 2
-  DMA2->HIFCR = (0x3D << 6);               // Stream 5
-  /* Set number of transfers */
-
-  DMA2_Stream5->NDTR = dma_ticks_used * 2;
-  DMA2_Stream1->NDTR = dma_ticks_used * 2;
-  DMA2_Stream2->NDTR = dma_ticks_used * 2;
-  /* Enable DMA streams */
-  DMA1_Stream1->CR |= DMA_SxCR_EN;
-  DMA1_Stream5->CR |= DMA_SxCR_EN;
-  DMA1_Stream6->CR |= DMA_SxCR_EN;
-  DMA2_Stream5->CR |= DMA_SxCR_EN;
-  DMA2_Stream1->CR |= DMA_SxCR_EN;
-  DMA2_Stream2->CR |= DMA_SxCR_EN;
-
-  /* Start TIM1 */
-  simulation_running = 1;
-
-  TIM1->CNT = 0;
-  TIM1->SR = 0;
-  TIM1->CR1 |= TIM_CR1_CEN;
 }
 /* USER CODE END 0 */
 /**
@@ -226,53 +119,27 @@ void DDA_Start(void) {
  * @retval int
  */
 int main(void) {
-  /* USER CODE BEGIN 1 */
-  /* USER CODE END 1 */
-  /* MCU Configuration--------------------------------------------------------*/
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick.
-   */
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
-  /* USER CODE BEGIN Init */
-  /* USER CODE END Init */
   /* Configure the system clock */
   SystemClock_Config();
   /* Configure the peripherals common clocks */
   PeriphCommonClock_Config();
-  /* USER CODE BEGIN SysInit */
-  // Force SysTick recalibrate — dùng HAL_RCC_GetSysClockFreq() trực tiếp
+  /* Force SysTick recalibrate */
   SystemCoreClock = HAL_RCC_GetSysClockFreq();
   HAL_SYSTICK_Config(SystemCoreClock / 1000U);
-  /* USER CODE END SysInit */
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  // Bỏ qua các ngoại vi không cần thiết cho test — tránh treo MCU
-  // MX_CAN1_Init();
-  // MX_SDIO_SD_Init();
-  // MX_USB_OTG_FS_PCD_Init();
   /* USER CODE BEGIN 2 */
+  MX_USB_DEVICE_Init();
   MX_TIM1_Init();
   DDA_Init();
   DMA_StepInit();
+  
+  extern void main_pingpong(void);
+  main_pingpong();
   /* USER CODE END 2 */
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
   while (1) {
-    /* Phase 3 Test — 6 axes synchronized DDA
-     * M0=1000, M1=2000, M2=3000, M3=4000(dominant), M4=500, M5=0 */
-    uint32_t test_steps[NUM_AXES] = {1800, 2000, 3000, 2000, 500, 0};
-    DDA_SetTarget(test_steps);
-    DDA_PreCompute();
-    DDA_Start();
-    /* Wait for all axes to complete */
-    while (simulation_running) {
-      /* Busy wait */
-    }
-    /* Toggle WORK_LED to show completion */
-    HAL_GPIO_TogglePin(WORK_LED_GPIO_Port, WORK_LED_Pin);
-    /* Delay 1 second before next run */
-    HAL_Delay(1000);
-    /* USER CODE END WHILE */
-    /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
 }
@@ -362,7 +229,8 @@ void MX_TIM1_Init(void) {
   TIM1->SR = 0;
   /* 7. Enable DMA requests: Update (UDE), CC1 (CC1DE), CC2 (CC2DE) */
   TIM1->DIER |= (TIM_DIER_UDE | TIM_DIER_CC1DE | TIM_DIER_CC2DE);
-  /* 8. Enable CC1 and CC2 outputs internally (required for compare event DMA trigger) */
+  /* 8. Enable CC1 and CC2 outputs internally (required for compare event DMA
+   * trigger) */
   TIM1->CCER |= (TIM_CCER_CC1E | TIM_CCER_CC2E);
   /* 9. Set MOE bit in BDTR to enable main outputs for advanced timer */
   TIM1->BDTR |= TIM_BDTR_MOE;
@@ -382,19 +250,24 @@ void DMA_StepInit(void) {
   DMA2_Stream2->CR &= ~DMA_SxCR_EN;
   /* Wait for streams to be disabled */
 
-  while (DMA2_Stream5->CR & DMA_SxCR_EN);
-  while (DMA2_Stream1->CR & DMA_SxCR_EN);
-  while (DMA2_Stream2->CR & DMA_SxCR_EN);
+  while (DMA2_Stream5->CR & DMA_SxCR_EN)
+    ;
+  while (DMA2_Stream1->CR & DMA_SxCR_EN)
+    ;
+  while (DMA2_Stream2->CR & DMA_SxCR_EN)
+    ;
   /* 3. Set Peripheral Address (PAR) to GPIO BSRR registers */
 
   DMA2_Stream5->PAR = (uint32_t)&(GPIOF->BSRR);
   DMA2_Stream1->PAR = (uint32_t)&(GPIOG->BSRR);
   DMA2_Stream2->PAR = (uint32_t)&(GPIOC->BSRR);
   /* 4. Set Memory Address (M0AR) to our precomputed buffers */
-
-  DMA2_Stream5->M0AR = (uint32_t)bsrr_portF;
-  DMA2_Stream1->M0AR = (uint32_t)bsrr_portG;
-  DMA2_Stream2->M0AR = (uint32_t)bsrr_portC;
+  extern uint32_t bsrr_portF_0[];
+  extern uint32_t bsrr_portG_0[];
+  extern uint32_t bsrr_portC_0[];
+  DMA2_Stream5->M0AR = (uint32_t)bsrr_portF_0;
+  DMA2_Stream1->M0AR = (uint32_t)bsrr_portG_0;
+  DMA2_Stream2->M0AR = (uint32_t)bsrr_portC_0;
   /* 5. Configure Control Registers (CR):
    * - CHSEL: Channel 3 (3U << 25)
    * - CHSEL: Channel 6 (6U << 25)
@@ -405,9 +278,12 @@ void DMA_StepInit(void) {
    * - DIR: Memory-to-peripheral (1U << 6)
    */
 
-  DMA2_Stream5->CR = (6U << 25) | (2U << 16) | (2U << 13) | (2U << 11) | DMA_SxCR_MINC | (1U << 6) | DMA_SxCR_TCIE;
-  DMA2_Stream1->CR = (6U << 25) | (2U << 16) | (2U << 13) | (2U << 11) | DMA_SxCR_MINC | (1U << 6);
-  DMA2_Stream2->CR = (6U << 25) | (2U << 16) | (2U << 13) | (2U << 11) | DMA_SxCR_MINC | (1U << 6);
+  DMA2_Stream5->CR = (6U << 25) | (2U << 16) | (2U << 13) | (2U << 11) |
+                     DMA_SxCR_MINC | (1U << 6) | DMA_SxCR_TCIE;
+  DMA2_Stream1->CR = (6U << 25) | (2U << 16) | (2U << 13) | (2U << 11) |
+                     DMA_SxCR_MINC | (1U << 6);
+  DMA2_Stream2->CR = (6U << 25) | (2U << 16) | (2U << 13) | (2U << 11) |
+                     DMA_SxCR_MINC | (1U << 6);
   /* 6. Ensure Direct Mode is used (DMDIS = 0 in FCR) */
 
   DMA2_Stream5->FCR &= ~DMA_SxFCR_DMDIS;
@@ -418,78 +294,118 @@ void DMA_StepInit(void) {
   HAL_NVIC_SetPriority(DMA2_Stream5_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA2_Stream5_IRQn);
 }
-void DDA_PreCompute(void) {
-  /* Copy axes configuration to a local copy to run simulation offline without modifying actual steps_done */
-  AxisConfig_t local_axes[NUM_AXES];
-  for (int i = 0; i < NUM_AXES; i++) {
-    local_axes[i] = axes[i];
+/* DDA_PreCompute has been replaced by the streaming ping-pong precompute in main_pingpong.c */
+
+uint8_t USB_IsConnected(void) {
+  extern PCD_HandleTypeDef hpcd_USB_OTG_FS;
+  if (hpcd_USB_OTG_FS.State == HAL_PCD_STATE_READY) {
+    USB_OTG_DeviceTypeDef *device =
+        (USB_OTG_DeviceTypeDef *)((uint32_t)USB_OTG_FS + USB_OTG_DEVICE_BASE);
+    if ((device->DSTS & USB_OTG_DSTS_SUSPSTS) == 0) {
+      return 1;
+    }
   }
-  uint32_t tick = 0;
-  for (tick = 0; tick < DMA_TICKS; tick++) {
-    uint8_t all_done = 1;
-    uint32_t reset_maskF = 0;
-    uint32_t set_maskF = 0;
-    uint32_t reset_maskG = 0;
-    uint32_t set_maskG = 0;
-    uint32_t reset_maskC = 0;
-    uint32_t set_maskC = 0;
+  return 0;
+}
+
+__attribute__((weak)) uint8_t CDC_Transmit_FS(uint8_t *Buf, uint16_t Len) {
+  return 0; // Weak stub: return OK if VCP driver is not generated yet
+}
+
+void CDC_Send_Status(void) {
+  uint8_t tx_buf[30];
+  tx_buf[0] = 0xAA;
+  tx_buf[1] = 'S';
+  tx_buf[2] = simulation_running ? 0x01 : 0x00;
+
+  // Pack steps_done for 6 axes as big-endian 32-bit integers
+  for (int i = 0; i < NUM_AXES; i++) {
+    uint32_t sd = axes[i].steps_done;
+    tx_buf[3 + i * 4] = (uint8_t)(sd >> 24);
+    tx_buf[3 + i * 4 + 1] = (uint8_t)(sd >> 16);
+    tx_buf[3 + i * 4 + 2] = (uint8_t)(sd >> 8);
+    tx_buf[3 + i * 4 + 3] = (uint8_t)sd;
+  }
+  tx_buf[27] = 0x0A; // EOL
+
+  CDC_Transmit_FS(tx_buf, 28);
+}
+
+void CDC_Parse_Command(uint8_t *buf, uint32_t len) {
+  if (len < 3 || buf[0] != 0xAA)
+    return; // Check SOF
+
+  usb_active = 1; // Mark USB as active
+
+  if (usb_mode == 0) {
+    /* Abort test mode and transition to USB mode */
+    usb_mode = 1;
+    extern volatile uint8_t queue_head;
+    extern volatile uint8_t queue_tail;
+    extern volatile uint8_t pp_buf_ready[2];
+    extern volatile uint16_t current_move_ticks_left;
+    extern volatile uint16_t current_play_ticks_left;
+    
+    TIM1->CR1 &= ~TIM_CR1_CEN;
+    DMA2_Stream5->CR &= ~DMA_SxCR_EN;
+    DMA2_Stream1->CR &= ~DMA_SxCR_EN;
+    DMA2_Stream2->CR &= ~DMA_SxCR_EN;
+    simulation_running = 0;
+    
+    queue_head = 0;
+    queue_tail = 0;
+    pp_buf_ready[0] = 0;
+    pp_buf_ready[1] = 0;
+    current_move_ticks_left = 0;
+    current_play_ticks_left = 0;
+  }
+
+  if (buf[1] == 'M') { // Move command
+    if (len < 15) return;
+    int16_t steps[NUM_AXES];
     for (int i = 0; i < NUM_AXES; i++) {
-      /* RESET logic */
-      if (local_axes[i].state_timer > 0) {
-        local_axes[i].state_timer--;
-        if (local_axes[i].state_timer == 0) {
-          uint32_t reset_val = (uint32_t)local_axes[i].step_pin << 16;
-          if (local_axes[i].step_port == GPIOF) reset_maskF |= reset_val;
-          else if (local_axes[i].step_port == GPIOG) reset_maskG |= reset_val;
-          else if (local_axes[i].step_port == GPIOC) reset_maskC |= reset_val;
-        }
-      }
-      /* DDA accumulator logic */
-      if (local_axes[i].steps_done < local_axes[i].steps_total) {
-        all_done = 0;
-        local_axes[i].accum += local_axes[i].velocity;
-        if (local_axes[i].accum >= STEP_SCALE) {
-          local_axes[i].accum -= STEP_SCALE;
-          uint32_t set_val = local_axes[i].step_pin;
-          if (local_axes[i].step_port == GPIOF) set_maskF |= set_val;
-          else if (local_axes[i].step_port == GPIOG) set_maskG |= set_val;
-          else if (local_axes[i].step_port == GPIOC) set_maskC |= set_val;
-          local_axes[i].state_timer = 1;
-          local_axes[i].steps_done++;
-        }
-      }
+      steps[i] = (int16_t)((buf[2 + i * 2] << 8) | buf[3 + i * 2]);
     }
-    /* Store the precomputed masks into the DMA buffers */
-    bsrr_portF[2 * tick] = reset_maskF;
-    bsrr_portF[2 * tick + 1] = set_maskF;
-    bsrr_portG[2 * tick] = reset_maskG;
-    bsrr_portG[2 * tick + 1] = set_maskG;
-    bsrr_portC[2 * tick] = reset_maskC;
-    bsrr_portC[2 * tick + 1] = set_maskC;
-    /* Check if we can terminate early */
-    if (all_done) {
-      uint8_t timers_active = 0;
-      for (int i = 0; i < NUM_AXES; i++) {
-        if (local_axes[i].state_timer > 0) {
-          timers_active = 1;
-          break;
-        }
-      }
-      if (!timers_active) {
-        tick++; // Include the current tick
-        break;
-      }
+
+    extern void DDA_Queue_Move(int16_t steps[NUM_AXES]);
+    extern volatile uint8_t queue_head;
+    extern volatile uint8_t queue_tail;
+    
+    // Check if queue is full
+    uint8_t next_tail = (queue_tail + 1) % CMD_QUEUE_SIZE;
+    if (next_tail != queue_head) {
+      DDA_Queue_Move(steps);
+      uint8_t ack = 'K'; // Queued OK
+      CDC_Transmit_FS(&ack, 1);
+    } else {
+      uint8_t nack = 'N'; // Queue full
+      CDC_Transmit_FS(&nack, 1);
     }
-  }
-  if (tick > DMA_TICKS) {
-    tick = DMA_TICKS;
-  }
-  dma_ticks_used = tick;
-  /* Update the main axes steps_done since we simulated the whole trajectory */
-  for (int i = 0; i < NUM_AXES; i++) {
-    axes[i].steps_done = local_axes[i].steps_done;
-    axes[i].accum = local_axes[i].accum;
-    axes[i].state_timer = local_axes[i].state_timer;
+  } else if (buf[1] == 'E') { // Emergency Stop
+    TIM1->CR1 &= ~TIM_CR1_CEN;
+    DMA2_Stream5->CR &= ~DMA_SxCR_EN;
+    DMA2_Stream1->CR &= ~DMA_SxCR_EN;
+    DMA2_Stream2->CR &= ~DMA_SxCR_EN;
+    simulation_running = 0;
+    
+    extern volatile uint8_t queue_head;
+    extern volatile uint8_t queue_tail;
+    extern volatile uint8_t pp_buf_ready[2];
+    extern volatile uint16_t current_move_ticks_left;
+    extern volatile uint16_t current_play_ticks_left;
+    
+    queue_head = 0;
+    queue_tail = 0;
+    pp_buf_ready[0] = 0;
+    pp_buf_ready[1] = 0;
+    current_move_ticks_left = 0;
+    current_play_ticks_left = 0;
+    
+    for (int i = 0; i < NUM_AXES; i++) {
+      axes[i].step_port->BSRR = axes[i].step_pin; // Reset step pins to HIGH (idle)
+    }
+  } else if (buf[1] == 'S') { // Status Query
+    CDC_Send_Status();
   }
 }
 /* USER CODE END 4 */

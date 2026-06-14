@@ -36,7 +36,41 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
+#define NUM_AXES 6
+#define STEP_SCALE 65536U
+#define PP_TICKS 1000U
+#define PP_BUF_LEN (PP_TICKS * 2)
 
+typedef struct {
+  GPIO_TypeDef *step_port;
+  uint16_t step_pin;
+  GPIO_TypeDef *dir_port;
+  uint16_t dir_pin;
+  GPIO_TypeDef *en_port;
+  uint16_t en_pin;
+  uint32_t accum;
+  uint32_t velocity;
+  uint32_t steps_total;
+  uint32_t steps_done;
+  uint8_t state_timer;
+  uint8_t dir;
+} AxisConfig_t;
+
+typedef struct {
+  int16_t steps[NUM_AXES];
+} MoveCommand_t;
+
+#define CMD_QUEUE_SIZE 4
+extern MoveCommand_t cmd_queue[CMD_QUEUE_SIZE];
+extern volatile uint8_t queue_head;
+extern volatile uint8_t queue_tail;
+extern volatile uint8_t usb_mode;
+extern volatile uint8_t usb_active;
+extern volatile uint8_t pp_buf_ready[2];
+extern volatile uint8_t pp_current_buf;
+extern volatile uint8_t pp_next_buf;
+extern volatile uint16_t current_move_ticks_left;
+extern volatile uint16_t current_play_ticks_left;
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
