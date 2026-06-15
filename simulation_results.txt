@@ -1,0 +1,112 @@
+STEWART PLATFORM COLLAPSE SIMULATION
+============================================================
+Number of random configurations: 2000
+Max base Z displacement: 10.0
+
+Initial leg lengths: [39.6923517  39.69235172 39.69235176 39.69235176 39.69235172 39.6923517 ]
+
+Base joints at rest (Z=0):
+  Base 1: [  3.1 -12.6   0. ]
+  Base 2: [12.46192   3.615321  0.      ]
+  Base 3: [9.36192  8.984679 0.      ]
+  Base 4: [-9.36192   8.984679  0.      ]
+  Base 5: [-12.46192    3.615321   0.      ]
+  Base 6: [ -3.1 -12.6   0. ]
+
+Platform joints at rest (Z=38.95):
+  Plat 1: [ 8.526279 -7.232051 38.951552]
+  Plat 2: [10.526279 -3.767949 38.951552]
+  Plat 3: [ 2.       11.       38.951552]
+  Plat 4: [-2.       11.       38.951552]
+  Plat 5: [-10.526279  -3.767949  38.951552]
+  Plat 6: [-8.526279 -7.232051 38.951552]
+
+============================================================
+
+Verifying solver on initial configuration...
+  Solver success: True, error: 0.00000071
+  Found center: [ 1.09904947e-15 -1.24825764e-14  3.89515517e+01]
+
+  Progress: 200/2000 (collapsed: 10, stable: 190)
+  Progress: 400/2000 (collapsed: 21, stable: 379)
+  Progress: 600/2000 (collapsed: 33, stable: 567)
+  Progress: 800/2000 (collapsed: 37, stable: 763)
+  Progress: 1000/2000 (collapsed: 46, stable: 954)
+  Progress: 1200/2000 (collapsed: 53, stable: 1147)
+  Progress: 1400/2000 (collapsed: 64, stable: 1336)
+  Progress: 1600/2000 (collapsed: 73, stable: 1527)
+  Progress: 1800/2000 (collapsed: 83, stable: 1717)
+  Progress: 2000/2000 (collapsed: 92, stable: 1908)
+
+============================================================
+RESULTS
+============================================================
+Total configurations: 2000
+Stable:  1908 (95.4%)
+Collapsed: 92 (4.6%)
+
+COLLAPSE EXAMPLES (first 10):
+
+  Example #1 (Test #2):
+    COLLAPSE: Solver failed (err=47082.1428)
+    Base Z displacements: [0.581 8.662 6.011 7.081 0.206 9.699]
+
+  Example #2 (Test #8):
+    COLLAPSE: Solver failed (err=5.4092)
+    Base Z displacements: [0.344 9.093 2.588 6.625 3.117 5.201]
+
+  Example #3 (Test #30):
+    COLLAPSE: Solver failed (err=5775075.5595)
+    Base Z displacements: [6.452 1.744 6.909 3.867 9.367 1.375]
+
+  Example #4 (Test #79):
+    COLLAPSE: Solver failed (err=885766228830415872.0000)
+    Base Z displacements: [2.236 9.632 0.122 9.699 0.432 8.911]
+
+  Example #5 (Test #129):
+    COLLAPSE: Solver failed (err=6.4567)
+    Base Z displacements: [3.421 8.213 1.106 8.465 1.275 3.973]
+
+  Example #6 (Test #141):
+    COLLAPSE: Solver failed (err=18522467785167.3359)
+    Base Z displacements: [0.131 6.635 1.78  9.611 1.487 4.146]
+
+  Example #7 (Test #142):
+    COLLAPSE: Solver failed (err=32263009073.4729)
+    Base Z displacements: [0.853 9.969 5.022 5.954 0.671 7.5  ]
+
+  Example #8 (Test #157):
+    COLLAPSE: Solver failed (err=1950249867343205.5000)
+    Base Z displacements: [0.184 9.143 1.178 5.765 2.741 5.542]
+
+  Example #9 (Test #182):
+    COLLAPSE: Solver failed (err=1445209168.3857)
+    Base Z displacements: [6.134 1.67  9.912 2.317 9.427 6.496]
+
+  Example #10 (Test #197):
+    COLLAPSE: Solver failed (err=6511535187.1267)
+    Base Z displacements: [7.798 1.07  7.61  5.413 9.63  3.419]
+
+STABLE EXAMPLES (first 3):
+
+  Stable #1:
+    Z displacements: [4.170e+00 7.203e+00 1.000e-03 3.023e+00 1.468e+00 9.230e-01]
+    STABLE: center=(5.1,-6.3,40.6), tilt=13.1°, err=0.000001
+    Platform joint Z range: (38.52, 43.13)
+
+  Stable #2:
+    Z displacements: [4.36  0.259 5.497 4.353 4.204 3.303]
+    STABLE: center=(1.3,5.7,41.8), tilt=11.1°, err=0.000001
+    Platform joint Z range: (39.66, 43.45)
+
+  Stable #3:
+    Z displacements: [5.508 7.081 2.909 5.108 8.929 8.963]
+    STABLE: center=(1.1,-4.3,45.0), tilt=16.1°, err=0.000001
+    Platform joint Z range: (42.29, 48.03)
+
+============================================================
+SUMMARY
+============================================================
+The platform is generally STABLE but can collapse in some cases.
+
+Collapse rate: 4.6% (92/2000)

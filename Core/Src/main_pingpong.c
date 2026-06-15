@@ -161,6 +161,10 @@ void DDA_Start_PP(uint8_t buffer_idx) {
   DMA2->LIFCR = (0x3D << 6) | (0x3D << 16); // Stream 1 and 2
   DMA2->HIFCR = (0x3D << 6);               // Stream 5
   
+  /* Clear pending timer events and reset count to prevent premature DMA triggers */
+  TIM1->SR = 0;
+  TIM1->CNT = 0;
+  
   /* Set memory addresses */
   DMA2_Stream5->M0AR = addrF;
   DMA2_Stream1->M0AR = addrG;
@@ -178,8 +182,6 @@ void DDA_Start_PP(uint8_t buffer_idx) {
   
   /* Start TIM1 */
   simulation_running = 1;
-  TIM1->CNT = 0;
-  TIM1->SR = 0;
   TIM1->CR1 |= TIM_CR1_CEN;
 }
 
@@ -204,6 +206,9 @@ void main_pingpong(void) {
   HAL_GPIO_WritePin(WORK_LED_GPIO_Port, WORK_LED_Pin, GPIO_PIN_SET);
   
   while (1) {
+    extern void CDC_Transmit_Queue_Process(void);
+    CDC_Transmit_Queue_Process();
+
     /* If in USB mode and no USB activity yet, handle 10s timeout to fall back to test mode */
     if (usb_mode == 1 && !usb_active) {
       if (HAL_GetTick() > 10000) {
@@ -218,8 +223,10 @@ void main_pingpong(void) {
     if (usb_mode == 0) {
       if (!simulation_running && (queue_head == queue_tail)) {
         if (HAL_GetTick() - last_test_tick >= 1000) {
-          int16_t test_steps[NUM_AXES] = {1800, 2000, 3000, 2000, 500, 0};
-          DDA_Queue_Move(test_steps);
+          int16_t test_steps1[NUM_AXES] = {1800, 2000, 3000, 2000, 500, 0};
+          int16_t test_steps2[NUM_AXES] = {3000, 100, 1500, 600, 10, 500};
+          DDA_Queue_Move(test_steps1);
+          DDA_Queue_Move(test_steps2);
           last_test_tick = HAL_GetTick();
           HAL_GPIO_TogglePin(WORK_LED_GPIO_Port, WORK_LED_Pin); // Toggle LED to show execution
         }

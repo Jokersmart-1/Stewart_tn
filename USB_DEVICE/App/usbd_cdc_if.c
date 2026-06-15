@@ -94,7 +94,11 @@ uint8_t UserRxBufferFS[APP_RX_DATA_SIZE];
 uint8_t UserTxBufferFS[APP_TX_DATA_SIZE];
 
 /* USER CODE BEGIN PRIVATE_VARIABLES */
-
+#define TX_RING_SIZE 1024
+static uint8_t tx_ring_buf[TX_RING_SIZE];
+static volatile uint16_t tx_ring_head = 0;
+static volatile uint16_t tx_ring_tail = 0;
+static uint8_t tx_temp_buf[64] __attribute__((aligned(4)));
 /* USER CODE END PRIVATE_VARIABLES */
 
 /**
@@ -269,6 +273,29 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
   /* USER CODE END 6 */
 }
 
+void CDC_Transmit_Queue_Process(void)
+{
+  USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceFS.pClassData;
+  if (!hcdc || tx_ring_head == tx_ring_tail) {
+    return;
+  }
+
+  uint32_t primask = __get_PRIMASK();
+  __disable_irq();
+  if (hcdc->TxState == 0) {
+    uint16_t len = 0;
+    while (tx_ring_head != tx_ring_tail && len < sizeof(tx_temp_buf)) {
+      tx_temp_buf[len++] = tx_ring_buf[tx_ring_head];
+      tx_ring_head = (tx_ring_head + 1) % TX_RING_SIZE;
+    }
+    if (len > 0) {
+      USBD_CDC_SetTxBuffer(&hUsbDeviceFS, tx_temp_buf, len);
+      USBD_CDC_TransmitPacket(&hUsbDeviceFS);
+    }
+  }
+  __set_PRIMASK(primask);
+}
+
 /**
   * @brief  CDC_Transmit_FS
   *         Data to send over USB IN endpoint are sent over CDC interface
@@ -284,12 +311,16 @@ uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len)
 {
   uint8_t result = USBD_OK;
   /* USER CODE BEGIN 7 */
-  USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceFS.pClassData;
-  if (hcdc->TxState != 0){
-    return USBD_BUSY;
+  for (uint16_t i = 0; i < Len; i++) {
+    uint16_t next = (tx_ring_tail + 1) % TX_RING_SIZE;
+    if (next != tx_ring_head) {
+      tx_ring_buf[tx_ring_tail] = Buf[i];
+      tx_ring_tail = next;
+    } else {
+      result = USBD_BUSY; // Ring buffer overflow
+    }
   }
-  USBD_CDC_SetTxBuffer(&hUsbDeviceFS, Buf, Len);
-  result = USBD_CDC_TransmitPacket(&hUsbDeviceFS);
+  CDC_Transmit_Queue_Process();
   /* USER CODE END 7 */
   return result;
 }
@@ -313,6 +344,7 @@ static int8_t CDC_TransmitCplt_FS(uint8_t *Buf, uint32_t *Len, uint8_t epnum)
   UNUSED(Buf);
   UNUSED(Len);
   UNUSED(epnum);
+  CDC_Transmit_Queue_Process();
   /* USER CODE END 13 */
   return result;
 }

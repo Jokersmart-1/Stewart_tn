@@ -1,0 +1,137 @@
+================================================================================
+STEWART PLATFORM - PHYSICAL COLLAPSE SIMULATION
+================================================================================
+
+SYSTEM DESCRIPTION:
+  - 6 Platform joints: rigid hexagon at Z=38.95
+    Connections: 1-2-3-4-5-6-1
+    Joints: [[8.526279, -7.232051, 38.951552], [10.526279, -3.767949, 38.951552], [2.0, 11.0, 38.951552], [-2.0, 11.0, 38.951552], [-10.526279, -3.767949, 38.951552], [-8.526279, -7.232051, 38.951552]]
+
+  - 6 Base joints: hexagon at Z=0, each can move along Z (0-10)
+    Joints: [[3.1, -12.6, 0.0], [12.46192, 3.615321, 0.0], [9.36192, 8.984679, 0.0], [-9.36192, 8.984679, 0.0], [-12.46192, 3.615321, 0.0], [-3.1, -12.6, 0.0]]
+
+  - Base i is connected to Platform i by fixed-length rigid link
+    Leg lengths: [39.6924 39.6924 39.6924 39.6924 39.6924 39.6924]
+    Platform center at rest: [ 0.        0.       38.951552]
+
+Solver verification (rest config):
+  Converged: True, Error: 0.00000000
+  Solved center: (0.0000, 0.0000, 38.9516)
+
+  Progress: 1000/5000 (5.9s) - collapsed: 99, stable: 901
+  Progress: 2000/5000 (12.5s) - collapsed: 194, stable: 1806
+  Progress: 3000/5000 (16.0s) - collapsed: 275, stable: 2725
+  Progress: 4000/5000 (21.5s) - collapsed: 368, stable: 3632
+  Progress: 5000/5000 (26.9s) - collapsed: 450, stable: 4550
+
+================================================================================
+RESULTS
+================================================================================
+Total configurations tested: 5000
+Simulation time: 26.9s
+
+  STABLE:    4550 configurations (91.00%)
+  COLLAPSED:   450 configurations (9.00%)
+
+COLLAPSE BREAKDOWN:
+  Geometric impossibility (solver failed): 450 cases (100.0%)
+
+PATTERN ANALYSIS:
+  Stable configs - mean Z: 4.993, std: 2.841
+  Stable configs - max Z diff (range): 7.035
+  Collapsed configs - mean Z: 5.025, std: 3.240
+  Collapsed configs - max Z diff (range): 8.348
+
+--------------------------------------------------------------------------------
+COLLAPSE EXAMPLES:
+--------------------------------------------------------------------------------
+
+  #1 Test 2:
+    Reason: Solver failed
+    Z: [0.58 8.66 6.01 7.08 0.21 9.70]
+
+  #2 Test 8:
+    Reason: Solver failed
+    Z: [0.34 9.09 2.59 6.63 3.12 5.20]
+
+  #3 Test 30:
+    Reason: Solver failed
+    Z: [6.45 1.74 6.91 3.87 9.37 1.38]
+
+  #4 Test 79:
+    Reason: Solver failed
+    Z: [2.24 9.63 0.12 9.70 0.43 8.91]
+
+  #5 Test 113:
+    Reason: Solver failed
+    Z: [0.80 5.25 4.10 9.82 1.12 3.98]
+
+  #6 Test 115:
+    Reason: Solver failed
+    Z: [9.29 5.57 5.72 2.80 7.69 1.87]
+
+  #7 Test 120:
+    Reason: Solver failed
+    Z: [3.49 9.30 8.31 9.65 1.24 7.31]
+
+  #8 Test 122:
+    Reason: Solver failed
+    Z: [1.40 7.95 2.02 1.64 1.64 8.15]
+
+--------------------------------------------------------------------------------
+STABLE EXAMPLES:
+--------------------------------------------------------------------------------
+
+  #1 Test 1:
+    Z: [3.75 9.51 7.32 5.99 1.56 1.56]
+    Center: (-4.1, -6.4, 43.0), Tilt: 17°
+    Joint Z range: [39.63, 45.70]
+
+  #2 Test 3:
+    Z: [8.32 2.12 1.82 1.83 3.04 5.25]
+    Center: (3.6, 9.9, 41.1), Tilt: 10°
+    Joint Z range: [39.07, 42.65]
+
+  #3 Test 4:
+    Z: [4.32 2.91 6.12 1.39 2.92 3.66]
+    Center: (-6.8, 3.2, 41.5), Tilt: 4°
+    Joint Z range: [40.76, 41.98]
+
+  #4 Test 5:
+    Z: [4.56 7.85 2.00 5.14 5.92 0.46]
+    Center: (8.2, -12.3, 40.3), Tilt: 6°
+    Joint Z range: [39.30, 41.40]
+
+  #5 Test 6:
+    Z: [6.08 1.71 0.65 9.49 9.66 8.08]
+    Center: (15.5, 3.1, 41.4), Tilt: 20°
+    Joint Z range: [38.87, 45.19]
+
+--------------------------------------------------------------------------------
+SENSITIVITY ANALYSIS (varying max Z displacement):
+--------------------------------------------------------------------------------
+  Max Z=  5.0:  1999 stable,     1 collapsed (0.1% collapse rate)
+  Max Z= 10.0:  1826 stable,   174 collapsed (8.7% collapse rate)
+  Max Z= 15.0:  1518 stable,   482 collapsed (24.1% collapse rate)
+  Max Z= 20.0:  1253 stable,   747 collapsed (37.4% collapse rate)
+
+================================================================================
+PHYSICAL ANALYSIS
+================================================================================
+
+The Stewart platform is a parallel kinematic mechanism where:
+  1. The platform is a RIGID BODY (hexagon, edges fixed)
+  2. Each of 6 legs has a FIXED LENGTH (~39.69 units)
+  3. Base joints can only move ALONG Z AXIS (0 to 10)
+
+For the platform to exist in a valid configuration:
+  - The 6 spheres (radius = leg length) centered at each base joint
+    must have a common intersection with the platform's rigid
+    hexagon geometry
+
+When this intersection doesn't exist (geometric impossibility),
+the platform is said to have COLLAPSED.
+
+STABILITY RATING: MODERATE - Some configurations cause collapse, especially with uneven displacement.
+
+Collapse rate: 9.0% (450/5000)

@@ -18,3 +18,10 @@ Release/
 # OS generated files
 .DS_Store
 Thumbs.db
+
+# Python cached files
+__pycache__/
+*.pyc
+
+# Temporary directories
+ws_temp/

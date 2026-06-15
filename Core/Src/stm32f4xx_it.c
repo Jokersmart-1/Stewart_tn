@@ -195,11 +195,16 @@ void DMA2_Stream5_IRQHandler(void)
       } else {
         TIM1->CR1 &= ~TIM_CR1_CEN;
         simulation_running = 0;
+        for (int i = 0; i < NUM_AXES; i++) {
+          axes[i].step_port->BSRR = axes[i].step_pin; // Set all step pins HIGH (idle)
+        }
       }
     } else {
       TIM1->CR1 &= ~TIM_CR1_CEN; // Stop timer
-      extern volatile uint8_t simulation_running;
       simulation_running = 0;
+      for (int i = 0; i < NUM_AXES; i++) {
+        axes[i].step_port->BSRR = axes[i].step_pin; // Set all step pins HIGH (idle)
+      }
     }
   }
 }
