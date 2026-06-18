@@ -1,0 +1,41 @@
+======================================================================
+STEWART PLATFORM - DYNAMIC SIMULATION v2 (IK)
+======================================================================
+Params: BR=14.7, PR=8.5, BD=11.2, PD=4.8, LL=18.0, L_rest=39.845
+
+Method:
+  1. Heave/Roll/Sway -> Platform pose (C, R)
+  2. IK: tu P_world, Base XY co dinh -> tinh Z_base
+  3. Collapse neu Z_base < 0 hoac > 10
+
+RESULTS:
+  Steps: 300, Time: 0.03s
+  Stable:   300 (100.0%)
+  Collapsed:     0 (0.0%)
+
+Samples:
+  t=0.00s dh=+0.00 dR=+0.0deg dS=+0.00 -> CZ=39.0 Tilt=0deg BZ=[23.0 23.0 23.0 23.0 23.0 23.0] [OK]
+  t=0.05s dh=+0.73 dR=+0.8deg dS=+0.62 -> CZ=39.7 Tilt=1deg BZ=[24.0 23.6 23.7 23.7 23.6 24.0] [OK]
+  t=0.10s dh=+1.42 dR=+1.5deg dS=+1.22 -> CZ=40.4 Tilt=2deg BZ=[25.0 24.1 24.4 24.4 24.1 25.0] [OK]
+  t=0.15s dh=+2.06 dR=+2.2deg dS=+1.76 -> CZ=41.0 Tilt=2deg BZ=[25.9 24.6 25.1 25.1 24.6 25.9] [OK]
+  t=0.20s dh=+2.60 dR=+2.8deg dS=+2.23 -> CZ=41.6 Tilt=3deg BZ=[26.7 25.0 25.7 25.7 25.0 26.7] [OK]
+  t=0.25s dh=+3.03 dR=+3.3deg dS=+2.60 -> CZ=42.0 Tilt=3deg BZ=[27.4 25.4 26.2 26.2 25.4 27.4] [OK]
+  t=0.30s dh=+3.33 dR=+3.6deg dS=+2.85 -> CZ=42.3 Tilt=4deg BZ=[27.8 25.6 26.5 26.5 25.6 27.8] [OK]
+  t=0.35s dh=+3.48 dR=+3.8deg dS=+2.98 -> CZ=42.4 Tilt=4deg BZ=[28.1 25.8 26.7 26.7 25.8 28.1] [OK]
+  t=0.40s dh=+3.48 dR=+3.8deg dS=+2.98 -> CZ=42.4 Tilt=4deg BZ=[28.1 25.8 26.7 26.7 25.8 28.1] [OK]
+  t=0.45s dh=+3.33 dR=+3.6deg dS=+2.85 -> CZ=42.3 Tilt=4deg BZ=[27.8 25.6 26.5 26.5 25.6 27.8] [OK]
+  t=0.50s dh=+3.03 dR=+3.3deg dS=+2.60 -> CZ=42.0 Tilt=3deg BZ=[27.4 25.4 26.2 26.2 25.4 27.4] [OK]
+  t=0.55s dh=+2.60 dR=+2.8deg dS=+2.23 -> CZ=41.6 Tilt=3deg BZ=[26.7 25.0 25.7 25.7 25.0 26.7] [OK]
+  t=0.60s dh=+2.06 dR=+2.2deg dS=+1.76 -> CZ=41.0 Tilt=2deg BZ=[25.9 24.6 25.1 25.1 24.6 25.9] [OK]
+  t=0.65s dh=+1.42 dR=+1.5deg dS=+1.22 -> CZ=40.4 Tilt=2deg BZ=[25.0 24.1 24.4 24.4 24.1 25.0] [OK]
+  t=0.70s dh=+0.73 dR=+0.8deg dS=+0.62 -> CZ=39.7 Tilt=1deg BZ=[24.0 23.6 23.7 23.7 23.6 24.0] [OK]
+  t=0.75s dh=+0.00 dR=+0.0deg dS=+0.00 -> CZ=39.0 Tilt=0deg BZ=[23.0 23.0 23.0 23.0 23.0 23.0] [OK]
+  t=0.80s dh=-0.73 dR=-0.8deg dS=-0.62 -> CZ=38.2 Tilt=1deg BZ=[22.1 22.5 22.3 22.3 22.5 22.1] [OK]
+  t=0.85s dh=-1.42 dR=-1.5deg dS=-1.22 -> CZ=37.5 Tilt=2deg BZ=[21.2 22.1 21.7 21.7 22.1 21.2] [OK]
+  t=0.90s dh=-2.06 dR=-2.2deg dS=-1.76 -> CZ=36.9 Tilt=2deg BZ=[20.4 21.7 21.2 21.2 21.7 20.4] [OK]
+  t=0.95s dh=-2.60 dR=-2.8deg dS=-2.23 -> CZ=36.4 Tilt=3deg BZ=[19.8 21.4 20.7 20.7 21.4 19.8] [OK]
+
+======================================================================
+CONCLUSION:
+  Platform is STABLE under these dynamic conditions.
+======================================================================

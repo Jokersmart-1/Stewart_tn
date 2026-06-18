@@ -1,0 +1,14 @@
+﻿======================================================================
+STEWART PLATFORM - THAM SO TOI UU
+======================================================================
+
+Cau hinh mac dinh:
+  baseRadius=14.7, platformRadius=8.5
+  baseDistance=11.2, platformDistance=4.8
+  baseOffset = 20.85 deg
+  platOffset = 15.77 deg
+  Leg length (nghi) = 8.3903
+
+======================================================================
+Tim legLength LY TUONG nhat:
+======================================================================

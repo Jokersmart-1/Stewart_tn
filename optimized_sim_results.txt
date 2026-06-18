@@ -1,0 +1,65 @@
+======================================================================
+STEWART PLATFORM - OPTIMIZED PARAMETERS
+======================================================================
+baseRadius=10, platformRadius=7
+baseDistance=6, platformDistance=2
+legLength=16
+
+Simulation: 5000 random configs, base Z in [0,10]
+Time: 53.2s
+
+STABLE:  4355 (87.10%)
+COLLAPSED:   645 (12.90%)
+
+Collapse types:
+  SOLVER: 629 (97.5%)
+  TILT: 15 (2.3%)
+  ZMIN: 1 (0.2%)
+
+Collapse examples:
+
+#1 Test 1: SOLVER_FAIL
+  Z=[0.58 8.66 6.01 7.08 0.21 9.70]
+
+#2 Test 7: SOLVER_FAIL
+  Z=[0.34 9.09 2.59 6.63 3.12 5.20]
+
+#3 Test 11: SOLVER_FAIL
+  Z=[1.41 8.02 0.75 9.87 7.72 1.99]
+
+#4 Test 25: SOLVER_FAIL
+  Z=[9.08 2.40 1.45 4.89 9.86 2.42]
+
+#5 Test 29: SOLVER_FAIL
+  Z=[6.45 1.74 6.91 3.87 9.37 1.38]
+
+#6 Test 76: SOLVER_FAIL
+  Z=[0.11 4.69 0.56 1.19 1.18 6.49]
+
+#7 Test 78: SOLVER_FAIL
+  Z=[2.24 9.63 0.12 9.70 0.43 8.91]
+
+#8 Test 96: TILT_69
+  Z=[1.47 9.27 4.92 2.58 4.59 9.80]
+
+#9 Test 101: SOLVER_FAIL
+  Z=[2.06 3.64 5.03 6.90 0.39 7.99]
+
+#10 Test 112: SOLVER_FAIL
+  Z=[0.80 5.25 4.10 9.82 1.12 3.98]
+
+Stable examples:
+
+#1 Test 0: Center Z=19.0, Tilt=24deg
+
+#2 Test 2: Center Z=17.4, Tilt=11deg
+
+#3 Test 3: Center Z=17.6, Tilt=3deg
+
+#4 Test 4: Center Z=17.3, Tilt=19deg
+
+#5 Test 5: Center Z=18.4, Tilt=22deg
+
+======================================================================
+CONCLUSION: Collapse rate = 12.90%
+======================================================================

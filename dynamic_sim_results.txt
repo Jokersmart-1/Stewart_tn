@@ -1,0 +1,47 @@
+======================================================================
+STEWART PLATFORM - DYNAMIC SIMULATION
+======================================================================
+Parameters (DEFAULT):
+  baseRadius=14.7, platformRadius=8.5
+  baseDistance=11.2, platformDistance=4.8
+  legLength=18.0, L_rest=39.845
+
+Input:
+  Heave: dh = 3.5*sin(2*pi/1.5*t)
+  Roll:  dR = 3.8*sin(2*pi/1.5*t) deg
+  Sway:  dS = 3.0*sin(2*pi/1.5*t)
+  Period = 1.5s, Simulation = 3.0s
+
+RESULTS:
+  Total steps: 300
+  Stable:   300 (100.0%)
+  Collapsed:     0 (0.0%)
+
+Collapse events:
+
+Samples:
+  t=0.00s dh=+0.00 dR=+0.0deg dS=+0.00 -> Z=15.9 Tilt=0deg [OK]
+  t=0.05s dh=+0.73 dR=+0.8deg dS=+0.62 -> Z=16.7 Tilt=1deg [OK]
+  t=0.10s dh=+1.42 dR=+1.5deg dS=+1.22 -> Z=17.3 Tilt=2deg [OK]
+  t=0.15s dh=+2.06 dR=+2.2deg dS=+1.76 -> Z=18.0 Tilt=2deg [OK]
+  t=0.20s dh=+2.60 dR=+2.8deg dS=+2.23 -> Z=18.5 Tilt=3deg [OK]
+  t=0.25s dh=+3.03 dR=+3.3deg dS=+2.60 -> Z=18.9 Tilt=3deg [OK]
+  t=0.30s dh=+3.33 dR=+3.6deg dS=+2.85 -> Z=19.2 Tilt=4deg [OK]
+  t=0.35s dh=+3.48 dR=+3.8deg dS=+2.98 -> Z=19.4 Tilt=4deg [OK]
+  t=0.40s dh=+3.48 dR=+3.8deg dS=+2.98 -> Z=19.4 Tilt=4deg [OK]
+  t=0.45s dh=+3.33 dR=+3.6deg dS=+2.85 -> Z=19.2 Tilt=4deg [OK]
+  t=0.50s dh=+3.03 dR=+3.3deg dS=+2.60 -> Z=18.9 Tilt=3deg [OK]
+  t=0.55s dh=+2.60 dR=+2.8deg dS=+2.23 -> Z=18.5 Tilt=3deg [OK]
+  t=0.60s dh=+2.06 dR=+2.2deg dS=+1.76 -> Z=18.0 Tilt=2deg [OK]
+  t=0.65s dh=+1.42 dR=+1.5deg dS=+1.22 -> Z=17.3 Tilt=2deg [OK]
+  t=0.70s dh=+0.73 dR=+0.8deg dS=+0.62 -> Z=16.7 Tilt=1deg [OK]
+  t=0.75s dh=+0.00 dR=+0.0deg dS=+0.00 -> Z=15.9 Tilt=0deg [OK]
+  t=0.80s dh=-0.73 dR=-0.8deg dS=-0.62 -> Z=15.2 Tilt=1deg [OK]
+  t=0.85s dh=-1.42 dR=-1.5deg dS=-1.22 -> Z=14.5 Tilt=2deg [OK]
+  t=0.90s dh=-2.06 dR=-2.2deg dS=-1.76 -> Z=13.9 Tilt=2deg [OK]
+  t=0.95s dh=-2.60 dR=-2.8deg dS=-2.23 -> Z=13.3 Tilt=3deg [OK]
+
+======================================================================
+CONCLUSION:
+  Platform is STABLE under these dynamic conditions.
+======================================================================

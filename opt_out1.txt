@@ -1,0 +1,78 @@
+======================================================================
+TIM THAM SO TOI UU - STEWART PLATFORM
+======================================================================
+
+Default: BR=14.7 PR=8.5 BD=11.2 PD=4.8 LL=18.0
+  Collapse rate = 92.4% (took 10.1s)
+
+----------------------------------------------------------------------
+INDIVIDUAL SWEEPS
+----------------------------------------------------------------------
+
+baseRadius:
+  baseRadius=10: 92.5% [BAD]
+  baseRadius=12: 92.5% [BAD]
+  baseRadius=14: 92.0% [BAD]
+  baseRadius=16: 89.0% [BAD]
+  baseRadius=18: 79.5% [BAD]
+  baseRadius=20: 63.0% [BAD]
+
+platformRadius:
+  platformRadius=5: 85.5% [BAD]
+  platformRadius=7: 89.5% [BAD]
+  platformRadius=9: 91.0% [BAD]
+  platformRadius=11: 98.0% [BAD]
+  platformRadius=13: 99.0% [BAD]
+
+baseDistance:
+  baseDistance=4: 99.0% [BAD]
+  baseDistance=6: 99.5% [BAD]
+  baseDistance=8: 99.5% [BAD]
+  baseDistance=10: 94.0% [BAD]
+  baseDistance=12: 90.5% [BAD]
+
+platformDistance:
+  platformDistance=2: 97.0% [BAD]
+  platformDistance=4: 93.5% [BAD]
+  platformDistance=6: 89.0% [BAD]
+  platformDistance=8: 88.0% [BAD]
+  platformDistance=10: 88.0% [BAD]
+
+legLength:
+  legLength=14: 72.5% [BAD]
+  legLength=16: 87.0% [BAD]
+  legLength=18: 93.5% [BAD]
+  legLength=20: 97.0% [BAD]
+  legLength=22: 97.0% [BAD]
+  legLength=24: 15.5% [BAD]
+
+----------------------------------------------------------------------
+COMBO SWEEP
+----------------------------------------------------------------------
+
+  NEW BEST: 94.0% BR=10 PR=5 BD=4 PD=2 LL=16
+
+  NEW BEST: 22.0% BR=10 PR=5 BD=4 PD=4 LL=16
+
+  NEW BEST: 14.0% BR=10 PR=5 BD=4 PD=6 LL=16
+
+  NEW BEST: 8.0% BR=10 PR=5 BD=8 PD=8 LL=16
+  50/2000 (2%) est:4955s best=8.0%  100/2000 (5%) est:3736s best=8.0%  150/2000 (7%) est:3370s best=8.0%  200/2000 (10%) est:3417s best=8.0%  250/2000 (12%) est:3699s best=8.0%  300/2000 (15%) est:3619s best=8.0%  350/2000 (17%) est:3512s best=8.0%  400/2000 (20%) est:3371s best=8.0%  450/2000 (22%) est:3173s best=8.0%
+  NEW BEST: 7.0% BR=12 PR=5 BD=10 PD=8 LL=18
+  500/2000 (25%) est:2944s best=7.0%  550/2000 (27%) est:2775s best=7.0%
+  NEW BEST: 4.0% BR=12 PR=9 BD=4 PD=8 LL=22
+  600/2000 (30%) est:2629s best=4.0%  650/2000 (32%) est:2566s best=4.0%  700/2000 (35%) est:2489s best=4.0%  750/2000 (37%) est:2457s best=4.0%  800/2000 (40%) est:2330s best=4.0%  850/2000 (42%) est:2221s best=4.0%  900/2000 (45%) est:2077s best=4.0%  950/2000 (47%) est:1947s best=4.0%  1000/2000 (50%) est:1819s best=4.0%  1050/2000 (52%) est:1696s best=4.0%  1100/2000 (55%) est:1580s best=4.0%  1150/2000 (57%) est:1474s best=4.0%  1200/2000 (60%) est:1374s best=4.0%  1250/2000 (62%) est:1272s best=4.0%  1300/2000 (65%) est:1165s best=4.0%  1350/2000 (67%) est:1064s best=4.0%  1400/2000 (70%) est:966s best=4.0%  1450/2000 (72%) est:875s best=4.0%  1500/2000 (75%) est:786s best=4.0%  1550/2000 (77%) est:698s best=4.0%  1600/2000 (80%) est:611s best=4.0%
+  NEW BEST: 0.0% BR=18 PR=5 BD=4 PD=2 LL=16
+
+
+Total: 2447s
+
+======================================================================
+RESULTS
+======================================================================
+
+BEST: BR=18 PR=5 BD=4 PD=2 LL=16
+Collapse: 0.0%
+Verified(1000): 0.10%
+
+Default: 92.4% -> Best: 0.0%
