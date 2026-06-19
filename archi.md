@@ -6,7 +6,27 @@ Tài liệu tập trung mô tả bản chất toán học và logic vận hành 
 
 ---
 
-## 1. Khái Niệm Thuật Toán DDA Đồng Bộ
+## 1. Yêu Cầu Của Hệ Thống & Lý Do Chọn Thuật Toán DDA
+
+Để vận hành một hệ thống robot hoặc máy CNC nhiều trục (ví dụ: robot song song Stewart 6 bậc tự do), hệ thống điều khiển cần đáp ứng những yêu cầu nghiêm ngặt sau:
+
+1. **Đồng bộ hóa thời gian thực tuyệt đối:**
+   Tất cả các cơ cấu chấp hành (6 trục động cơ) phải bắt đầu chuyển động đồng thời và hoàn thành quãng đường của mình tại cùng một mili-giây. Nếu một trục về đích trước hoặc sau các trục còn lại, cấu trúc cơ khí sẽ bị xoắn, gây giật cục, sai lệch quỹ đạo hoặc tự khóa cơ học (kẹt cứng robot).
+2. **Tần số phát xung cực cao:**
+   Hệ thống yêu cầu tần số phát xung lên tới **200 kHz** (tương đương chu kỳ ngắt hoặc chu kỳ phát xung là **5 µs**).
+3. **Ràng buộc về tài nguyên tính toán của vi điều khiển:**
+   Tại tần số 200 kHz, vi điều khiển chỉ có đúng 5 µs (khoảng 900 chu kỳ lệnh đối với CPU chạy ở 180 MHz) cho mỗi nhịp đếm. Trong khoảng thời gian cực ngắn này, vi điều khiển vừa phải nhận/gửi dữ liệu với máy tính điều khiển (Host), hoán đổi bộ đệm, vừa phải phát xung đồng bộ cho cả 6 trục. Mọi phép toán phức tạp như số thực (float), phép nhân hoặc chia số thập phân trong nhịp đếm sẽ làm CPU bị quá tải ngay lập tức.
+4. **Độ chính xác tuyệt đối không sai số tích lũy:**
+   Tổng số xung phát ra của mỗi trục trong một khoảng thời gian phải chính xác 100% so với số bước mục tiêu được tính từ Host. Bất kỳ sự sai lệch hay mất xung nào cũng sẽ tích lũy qua các chu kỳ và làm lệch quỹ đạo của robot.
+
+### Vì sao chọn thuật toán DDA?
+* **Tối ưu hóa hiệu năng bằng toán số nguyên:** Thay vì tính toán tốc độ động cơ theo thời gian thực bằng các phép chia thập phân phức tạp, thuật toán DDA quy đổi mọi thao tác trong nhịp đếm 5 µs thành **phép cộng tích lũy số nguyên** và **phép so sánh**. Đây là những phép toán cơ bản nhất, chỉ tiêu tốn 1 đến 2 chu kỳ lệnh của CPU.
+* **Tự động phân phối xung đều đặn:** Giải thuật phân bố các xung kích hoạt động cơ trải đều trên toàn bộ khoảng thời gian chuyển động, giúp động cơ chạy êm hơn, giảm độ rung giật cơ học.
+* **Bảo đảm đồng bộ hóa tự động:** Bằng cách chia tỷ lệ tốc độ của từng động cơ dựa trên một khoảng thời gian chạy chung, thuật toán DDA đảm bảo tất cả các động cơ tự động đồng bộ hành trình và luôn về đích cùng lúc.
+
+---
+
+## 2. Khái Niệm Thuật Toán DDA Đồng Bộ
 
 Trong điều khiển robot hoặc máy công cụ CNC, khi muốn di chuyển cơ cấu từ điểm A sang điểm B trong một khoảng thời gian cố định, các trục động cơ khác nhau sẽ phải đi các quãng đường (số bước) khác nhau. 
 

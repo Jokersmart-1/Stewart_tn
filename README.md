@@ -64,7 +64,13 @@ Các chân phát xung (STEP), chiều quay (DIR) và cho phép động cơ (EN) 
 Firmware tích hợp ba cơ chế cốt lõi để đảm bảo chuyển động của 6 trục luôn mượt mà và đồng bộ:
 
 ### A. Thuật toán DDA (Digital Differential Analyzer)
-Hệ thống sử dụng thuật toán DDA để điều khiển đồng bộ đa trục. Mọi phép toán trong vòng lặp thời gian thực được tối ưu hóa chỉ dùng phép cộng và phép so sánh số nguyên trên bộ tích lũy (accumulator), loại bỏ hoàn toàn các phép chia số thực vốn rất chậm. Chi tiết giải thuật và sơ đồ khối được trình bày riêng tại file [archi.md](file:///d:/final/archi.md).
+Hệ thống sử dụng thuật toán DDA để giải quyết các yêu cầu nghiêm ngặt sau của hệ thống:
+* **Đồng bộ hóa tuyệt đối:** Cánh tay robot hoặc cơ cấu song song (như robot Stewart) đòi hỏi tất cả các trục (6 trục) phải di chuyển phối hợp và dừng lại tại cùng một thời điểm. Việc lệch pha chuyển động dù chỉ vài mili-giây sẽ làm biến dạng cơ khí, gây giật cục hoặc kẹt khớp.
+* **Thời gian đáp ứng siêu nhanh (200 kHz):** Chu kỳ phát xung là 5 µs (900 chu kỳ lệnh ở tần số 180 MHz). Việc thực hiện các phép toán chia số thực hay tính toán động học thời gian thực trên vi điều khiển là không khả thi.
+* **Toán số nguyên tối ưu:** DDA giải quyết điều này bằng cách chuyển đổi toàn bộ logic trong vòng lặp phát xung thành **phép cộng tích lũy số nguyên** và **phép so sánh cơ bản**, thực hiện cực nhanh (1–2 chu kỳ CPU).
+* **Độ chính xác cao:** Không tạo ra sai số tích lũy qua các chu kỳ, đảm bảo phát đúng số bước yêu cầu.
+
+Chi tiết giải thuật toán học và sơ đồ khối hoạt động được trình bày riêng tại file [archi.md](file:///d:/final/archi.md).
 
 ### B. Cơ chế Bộ đệm kép Ping-Pong (Double-Buffering)
 * **Giới hạn RAM:** Lưu trữ toàn bộ chuỗi xung cho lệnh 20ms (4000 ticks ở tần số 200kHz) của 6 trục sẽ gây tràn bộ nhớ 128KB SRAM của chip.
