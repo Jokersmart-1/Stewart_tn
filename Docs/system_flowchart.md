@@ -29,53 +29,53 @@ flowchart TD
     classDef estop fill:#f8d7da,stroke:#333,stroke-width:2px;
 
     %% Luồng Khởi tạo
-    PowerOn([Cấp nguồn / Reset]) --> Init[Khởi tạo phần cứng:<br>- SYSCLK 180MHz<br>- GPIO pins STEP/DIR/EN/STOP<br>- USB CDC, TIM1, DMA<br>- Reset hàng đợi cmd_queue]:::init
-    Init --> CheckHoming{Nhận lệnh Homing 'H' <br/> từ Host?}:::idle
+    PowerOn([Cấp nguồn / Reset]) --> Init["Khởi tạo phần cứng:<br>- SYSCLK 180MHz<br>- GPIO pins STEP/DIR/EN/STOP<br>- USB CDC, TIM1, DMA<br>- Reset hàng đợi cmd_queue"]:::init
+    Init --> CheckHoming{"Nhận lệnh Homing 'H' <br/> từ Host?"}:::idle
 
     %% Luồng Homing (Thiết lập gốc tọa độ)
-    CheckHoming -- Yes --> HomeStart[Bắt đầu Homing 6 trục]:::homing
-    HomeStart --> HomeDir[Đặt hướng di chuyển DIR ngược về phía cảm biến hành trình]:::homing
-    HomeDir --> HomeLoop[Phát xung chậm cho các trục chưa chạm End-stop]:::homing
-    HomeLoop --> ReadStops{Đọc chân STOP_0..5 <br/> Trục nào chạm End-stop?}:::homing
+    CheckHoming -- Yes --> HomeStart["Bắt đầu Homing 6 trục"]:::homing
+    HomeStart --> HomeDir["Đặt hướng di chuyển DIR ngược về phía cảm biến hành trình"]:::homing
+    HomeDir --> HomeLoop["Phát xung chậm cho các trục chưa chạm End-stop"]:::homing
+    HomeLoop --> ReadStops{"Đọc chân STOP_0..5 <br/> Trục nào chạm End-stop?"}:::homing
     
-    ReadStops -- Trục i chạm --> StopAxis[Dừng phát xung trục i]:::homing
-    StopAxis --> CheckAllHome{Tất cả 6 trục <br/> đã chạm End-stop?}:::homing
+    ReadStops -- Trục i chạm --> StopAxis["Dừng phát xung trục i"]:::homing
+    StopAxis --> CheckAllHome{"Tất cả 6 trục <br/> đã chạm End-stop?"}:::homing
     
     ReadStops -- Chưa chạm --> HomeLoop
     
     CheckAllHome -- Chưa --> HomeLoop
     
     %% Quy trình lùi nhẹ (Backoff) để tăng độ chính xác homing
-    CheckAllHome -- Rồi --> Backoff[Lùi nhẹ các trục ra xa cảm biến hành trình <br/> và chạm lại lần 2 với tốc độ cực chậm]:::homing
-    Backoff --> SetZero[Thiết lập vị trí hiện tại làm gốc tọa độ 0 <br/> Xóa sạch hàng đợi lệnh]:::homing
-    SetZero --> SendHomeDone[Gửi phản hồi 'Homing Done' về Host]:::homing
+    CheckAllHome -- Rồi --> Backoff["Lùi nhẹ các trục ra xa cảm biến hành trình <br/> và chạm lại lần 2 với tốc độ cực chậm"]:::homing
+    Backoff --> SetZero["Thiết lập vị trí hiện tại làm gốc tọa độ 0 <br/> Xóa sạch hàng đợi lệnh"]:::homing
+    SetZero --> SendHomeDone["Gửi phản hồi 'Homing Done' về Host"]:::homing
     SendHomeDone --> IdleState:::idle
 
     %% Luồng Hoạt động bình thường (IDLE & RUNNING)
-    CheckHoming -- No --> IdleState[Trạng thái IDLE:<br>- Lắng nghe cổng USB CDC<br>- Đèn WORK_LED báo hiệu]:::idle
+    CheckHoming -- No --> IdleState["Trạng thái IDLE:<br>- Lắng nghe cổng USB CDC<br>- Đèn WORK_LED báo hiệu"]:::idle
     
-    IdleState --> RxCmd{Nhận dữ liệu <br/> từ USB CDC?}:::idle
+    IdleState --> RxCmd{"Nhận dữ liệu <br/> từ USB CDC?"}:::idle
     
     RxCmd -- Lệnh dừng khẩn 'E' --> EmergencyStop:::estop
     RxCmd -- Lệnh di chuyển 'M' --> ProcessMove:::run
     RxCmd -- Không nhận được --> IdleState
 
     %% Xử lý di chuyển
-    ProcessMove[Xử lý lệnh di chuyển M:<br>- Giải mã số bước 6 trục<br>- Đẩy vào cmd_queue và gửi ACK 'K'<br>- Tính toán phân đoạn DDA Ping-Pong]:::run
-    ProcessMove --> StartDma[Kích hoạt TIM1 + DMA <br/> Tự động phát xung ra GPIO]:::run
+    ProcessMove["Xử lý lệnh di chuyển M:<br>- Giải mã số bước 6 trục<br>- Đẩy vào cmd_queue và gửi ACK 'K'<br>- Tính toán phân đoạn DDA Ping-Pong"]:::run
+    ProcessMove --> StartDma["Kích hoạt TIM1 + DMA <br/> Tự động phát xung ra GPIO"]:::run
     
-    StartDma --> RunLoop{Đang di chuyển?}:::run
+    StartDma --> RunLoop{"Đang di chuyển?"}:::run
     RunLoop -- Phát hiện lệnh khẩn 'E' --> EmergencyStop:::estop
-    RunLoop -- Vẫn đang chạy bình thường --> WaitSegment[DMA tự động phát bộ đệm RAM]:::run
+    RunLoop -- Vẫn đang chạy bình thường --> WaitSegment["DMA tự động phát bộ đệm RAM"]:::run
     
-    WaitSegment --> FinishSegment{DMA phát hết 20ms <br/> của lệnh hiện tại?}:::run
+    WaitSegment --> FinishSegment{"DMA phát hết 20ms <br/> của lệnh hiện tại?"}:::run
     FinishSegment -- Chưa --> RunLoop
-    FinishSegment -- Rồi --> SendDone[Gửi tín hiệu 'D' Done về Host]:::run
+    FinishSegment -- Rồi --> SendDone["Gửi tín hiệu 'D' Done về Host"]:::run
     SendDone --> IdleState
 
     %% Luồng Dừng khẩn cấp (ESTOP)
-    EmergencyStop[Dừng khẩn cấp:<br>- Tắt cứng Timer 1 & các luồng DMA<br>- Kéo tất cả chân STEP về HIGH (Idle)<br>- Xóa sạch hàng đợi cmd_queue<br>- Gửi trạng thái lỗi về Host]:::estop
-    EmergencyStop --> ReInit[Chờ lệnh phục hồi từ Host]:::estop
+    EmergencyStop["Dừng khẩn cấp:<br>- Tắt cứng Timer 1 & các luồng DMA<br>- Kéo tất cả chân STEP về HIGH (Idle)<br>- Xóa sạch hàng đợi cmd_queue<br>- Gửi trạng thái lỗi về Host"]:::estop
+    EmergencyStop --> ReInit["Chờ lệnh phục hồi từ Host"]:::estop
     ReInit --> IdleState
 
     %% Áp dụng màu sắc cho từng block
