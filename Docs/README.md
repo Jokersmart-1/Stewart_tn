@@ -35,6 +35,7 @@ Nạp firmware qua **MicroSD card** (DFU/bootloader).
 | [`04_usb_communication.md`](04_usb_communication.md) | Giao tiếp USB OTG FS với Raspberry Pi |
 | [`05_sdcard_firmware_update.md`](05_sdcard_firmware_update.md) | Nạp firmware qua MicroSD (SDIO) |
 | [`06_development_roadmap.md`](06_development_roadmap.md) | Lộ trình phát triển, các giai đoạn |
+| [`07_system_cycle_flowchart.md`](07_system_cycle_flowchart.md) | Lưu đồ chu trình hoạt động & quy trình Homing |
 
 ---
 
