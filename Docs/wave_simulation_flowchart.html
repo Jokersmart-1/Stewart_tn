@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sơ Đồ Quy Trình Mô Phỏng Sóng Stewart Platform</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+        .card {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        h1 {
+            text-align: center;
+            color: #1a365d;
+            margin-bottom: 5px;
+        }
+        p.subtitle {
+            text-align: center;
+            color: #4a5568;
+            font-size: 13pt;
+            margin-bottom: 20px;
+        }
+        .zoom-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .btn-zoom {
+            background-color: #0288d1;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.1s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .btn-zoom:hover {
+            background-color: #01579b;
+            transform: translateY(-1px);
+        }
+        .btn-zoom:active {
+            transform: translateY(0);
+        }
+        .btn-reset {
+            background-color: #64748b;
+        }
+        .btn-reset:hover {
+            background-color: #475569;
+        }
+        .mermaid-wrapper {
+            position: relative;
+            width: 100%;
+            height: 520px;
+            background: #fafafa;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .mermaid-container {
+            width: 100%;
+            height: 100%;
+        }
+        .mermaid-container svg {
+            width: 100% !important;
+            height: 100% !important;
+            max-width: none !important;
+        }
+        .hint-text {
+            text-align: center;
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 6px;
+            font-style: italic;
+        }
+        .steps {
+            margin-top: 25px;
+            line-height: 1.6;
+            background: #f8fafc;
+            padding: 18px 25px;
+            border-radius: 8px;
+            border-left: 4px solid #0288d1;
+        }
+        .steps h3 {
+            margin-top: 0;
+            color: #0f172a;
+        }
+        .steps ol {
+            padding-left: 20px;
+            margin-bottom: 0;
+        }
+        .steps li {
+            margin-bottom: 8px;
+        }
+    </style>
+    <!-- Mermaid JS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <!-- SVG Pan Zoom CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
+</head>
+<body>
+    <div class="card">
+        <h1>SƠ ĐỒ QUY TRÌNH MÔ PHỎNG SÓNG (STEWART PLATFORM)</h1>
+        <p class="subtitle">Phân định Phần mềm, Phần cứng & Luồng Dữ liệu CSV</p>
+        
+        <!-- Thanh điều khiển Zoom/Pan -->
+        <div class="zoom-controls">
+            <button class="btn-zoom" onclick="zoomIn()">➕ Phóng to (Zoom In)</button>
+            <button class="btn-zoom" onclick="zoomOut()">➖ Thu nhỏ (Zoom Out)</button>
+            <button class="btn-zoom btn-reset" onclick="resetZoom()">🔄 Về kích thước chuẩn</button>
+        </div>
+
+        <div class="mermaid-wrapper">
+            <div class="mermaid-container">
+                <div class="mermaid">
+flowchart LR
+    subgraph SW["💻 PHẦN MỀM (SOFTWARE)"]
+        M1["MATLAB<br/>(Động học nghịch)"]
+        S1["PC Web Server<br/>(Bộ đệm & Gửi lệnh)"]
+        LA_SW["Logic SW<br/>(Ghi xung thực tế)"]
+        M2["MATLAB<br/>(Tính ngược hành trình)"]
+        R1["RecurDyn<br/>(Mô phỏng 3D)"]
+    end
+
+    subgraph DATA["📄 DỮ LIỆU (CSV)"]
+        D1[("1. trajectory.csv<br/>(Xung/DIR lý thuyết)")]
+        D2[("2. measured.csv<br/>(Xung/DIR thực tế)")]
+        D3[("3. motion.csv<br/>(Hành trình khôi phục)")]
+    end
+
+    subgraph HW["🔌 PHẦN CỨNG (HARDWARE)"]
+        PC["Host PC"]
+        MCU["MCU (STM32)<br/>(GPIO phát xung)"]
+        LA["Logic Analyzer<br/>(Que đo tín hiệu)"]
+        ST["Stewart Platform<br/>(Mô hình 3D)"]
+    end
+
+    %% Luồng kết nối
+    M1 --> D1 --> S1
+    S1 ==>|"USB/Serial"| MCU
+    MCU -->|"Tín hiệu GPIO"| LA --> LA_SW
+    LA_SW --> D2 --> M2 --> D3 --> R1
+    R1 --> ST
+                </div>
+            </div>
+        </div>
+        <p class="hint-text">💡 Mẹo: Bạn có thể lăn con trỏ chuột để Phóng to / Thu nhỏ hoặc Nhấp đúp / Cắm giữ chuột trái để Kéo thả (Pan) sơ đồ.</p>
+
+        <div class="steps">
+            <h3>📌 Tóm tắt luồng thực thi:</h3>
+            <ol>
+                <li><strong>MATLAB</strong> tính toán động học nghịch sóng $\rightarrow$ xuất file <code>trajectory.csv</code> (chuỗi xung & DIR lý thuyết).</li>
+                <li><strong>PC Web Server</strong> nạp dữ liệu $\rightarrow$ truyền gói lệnh qua <strong>USB/Serial</strong> xuống <strong>MCU (STM32)</strong>.</li>
+                <li><strong>MCU</strong> phát xung tại các chân GPIO $\rightarrow$ <strong>Logic Analyzer</strong> đo và xuất file <code>measured.csv</code> qua phần mềm <strong>Logic SW</strong>.</li>
+                <li><strong>MATLAB</strong> đọc <code>measured.csv</code> $\rightarrow$ tính ngược hành trình 6 chân $\rightarrow$ xuất file <code>motion.csv</code>.</li>
+                <li><strong>RecurDyn</strong> nạp file <code>motion.csv</code> để mô phỏng chuyển động sóng thực tế trên mô hình 3D <strong>Stewart Platform</strong>.</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'default',
+            securityLevel: 'loose',
+            flowchart: {
+                useMaxWidth: false,
+                htmlLabels: true,
+                curve: 'basis'
+            }
+        });
+
+        let panZoomInstance = null;
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Render Mermaid SVG
+            await mermaid.run({ querySelector: '.mermaid' });
+
+            const svgElement = document.querySelector('.mermaid svg');
+            if (svgElement) {
+                // Khởi tạo tính năng Zoom / Pan tương tác
+                panZoomInstance = svgPanZoom(svgElement, {
+                    zoomEnabled: true,
+                    controlIconsEnabled: false,
+                    fit: true,
+                    center: true,
+                    minZoom: 0.3,
+                    maxZoom: 12,
+                    zoomScaleSensitivity: 0.2
+                });
+
+                // Tự động căn giữa
+                window.addEventListener('resize', () => {
+                    if (panZoomInstance) {
+                        panZoomInstance.resize();
+                        panZoomInstance.fit();
+                        panZoomInstance.center();
+                    }
+                });
+            }
+        });
+
+        function zoomIn() {
+            if (panZoomInstance) panZoomInstance.zoomIn();
+        }
+
+        function zoomOut() {
+            if (panZoomInstance) panZoomInstance.zoomOut();
+        }
+
+        function resetZoom() {
+            if (panZoomInstance) {
+                panZoomInstance.reset();
+                panZoomInstance.fit();
+                panZoomInstance.center();
+            }
+        }
+    </script>
+</body>
+</html>

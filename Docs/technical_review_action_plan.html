@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kế Hoạch Sửa Lỗi Kỹ Thuật - Stewart Platform 6-PUS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-hover: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-red: #ef4444;
+            --accent-red-bg: rgba(239, 68, 68, 0.15);
+            --accent-yellow: #f59e0b;
+            --accent-yellow-bg: rgba(245, 158, 11, 0.15);
+            --accent-green: #10b981;
+            --accent-green-bg: rgba(16, 185, 129, 0.15);
+            --accent-blue: #3b82f6;
+            --border-color: #334155;
+            --code-bg: #090d16;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 24px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 15px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-card.red { border-top: 4px solid var(--accent-red); }
+        .stat-card.yellow { border-top: 4px solid var(--accent-yellow); }
+        .stat-card.green { border-top: 4px solid var(--accent-green); }
+        .stat-card.blue { border-top: 4px solid var(--accent-blue); }
+
+        .stat-val {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .stat-card.red .stat-val { color: var(--accent-red); }
+        .stat-card.yellow .stat-val { color: var(--accent-yellow); }
+        .stat-card.green .stat-val { color: var(--accent-green); }
+        .stat-card.blue .stat-val { color: var(--accent-blue); }
+
+        .stat-lbl {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filters {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .btn-filter {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 8px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-filter:hover, .btn-filter.active {
+            background: var(--accent-blue);
+            color: white;
+            border-color: var(--accent-blue);
+        }
+
+        .chapter-section {
+            margin-bottom: 40px;
+        }
+
+        .chapter-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            padding-left: 12px;
+            border-left: 4px solid var(--accent-blue);
+            color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .issue-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+
+        .issue-card:hover {
+            border-color: #475569;
+        }
+
+        .issue-header {
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.4);
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .issue-title {
+            font-weight: 600;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .badge {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge.critical {
+            background: var(--accent-red-bg);
+            color: var(--accent-red);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .badge.warning {
+            background: var(--accent-yellow-bg);
+            color: var(--accent-yellow);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .badge.good {
+            background: var(--accent-green-bg);
+            color: var(--accent-green);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .issue-loc {
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            color: #60a5fa;
+            background: rgba(59, 130, 246, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .issue-body {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .issue-body {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .box-problem {
+            background: rgba(239, 68, 68, 0.05);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .box-solution {
+            background: rgba(16, 185, 129, 0.05);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .box-title {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+        .box-problem .box-title { color: var(--accent-red); }
+        .box-solution .box-title { color: var(--accent-green); }
+
+        .code-block {
+            background: var(--code-bg);
+            border: 1px solid #1e293b;
+            border-radius: 6px;
+            padding: 12px;
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            color: #e2e8f0;
+            margin-top: 10px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+
+        .diff-remove {
+            color: #f87171;
+            background: rgba(239, 68, 68, 0.1);
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .diff-add {
+            color: #34d399;
+            background: rgba(16, 185, 129, 0.1);
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .quick-priority {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 40px;
+        }
+
+        .priority-list {
+            list-style: none;
+            margin-top: 16px;
+        }
+
+        .priority-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .priority-item:last-child {
+            border-bottom: none;
+        }
+
+        .num-circle {
+            background: var(--accent-red);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .num-circle.p2 { background: var(--accent-yellow); }
+        .num-circle.p3 { background: var(--accent-blue); }
+
+        footer {
+            text-align: center;
+            padding: 24px 0;
+            color: var(--text-muted);
+            font-size: 13px;
+            border-top: 1px solid var(--border-color);
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>Kế Hoạch Sửa Lỗi Kỹ Thuật Báo Cáo đồ Án</h1>
+                <div class="subtitle">Stewart Platform 6-PUS | Sinh viên: Bùi Gia Phú - MSSV: 2212574</div>
+            </div>
+            <div style="text-align: right;">
+                <span class="issue-loc">File Báo cáo: RaSoatKyThuat.pdf</span>
+            </div>
+        </header>
+
+        <!-- Dynamic Statistics Summary -->
+        <div class="stats-grid">
+            <div class="stat-card red">
+                <div class="stat-val">8</div>
+                <div class="stat-lbl">Lỗi Nghiêm Trọng (Phải sửa ngay)</div>
+            </div>
+            <div class="stat-card yellow">
+                <div class="stat-val">14</div>
+                <div class="stat-lbl">Cần Xem Lại & Bổ Sung</div>
+            </div>
+            <div class="stat-card green">
+                <div class="stat-val">6</div>
+                <div class="stat-lbl">Đánh Giá Tốt</div>
+            </div>
+            <div class="stat-card blue">
+                <div class="stat-val">28</div>
+                <div class="stat-lbl">Tổng Số Mục Rà Soát</div>
+            </div>
+        </div>
+
+        <!-- Filter Controls -->
+        <div class="filters">
+            <button class="btn-filter active" onclick="filterIssues('all')">Tất cả (28)</button>
+            <button class="btn-filter" onclick="filterIssues('critical')">🔴 Lỗi Nghiêm Trọng (8)</button>
+            <button class="btn-filter" onclick="filterIssues('warning')">🟡 Cần Xem Lại (14)</button>
+            <button class="btn-filter" onclick="filterIssues('good')">🟢 Đánh Giá Tốt (6)</button>
+        </div>
+
+        <!-- Priority Summary -->
+        <div class="quick-priority">
+            <h2 style="font-size: 18px; color: #f1f5f9; margin-bottom: 8px;">🔥 Top 4 Lỗi Nghiêm Trọng Nhất Bắt Buộc Phải Sửa Trước Bảo Vệ</h2>
+            <ul class="priority-list">
+                <li class="priority-item">
+                    <div class="num-circle">1</div>
+                    <div>
+                        <strong style="color: #f87171;">[Chương V - Eq. 5.8 & Eq. 3.8] Sai công thức Động học nghịch (Căn kép $\sqrt{\sqrt{...}}$)</strong>
+                        <p style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">Lỗi đánh máy dấu căn lồng nhau. Nếu code bị viết theo công thức này thì toàn bộ quỹ đạo chạy sẽ bị sai.</p>
+                    </div>
+                </li>
+                <li class="priority-item">
+                    <div class="num-circle">2</div>
+                    <div>
+                        <strong style="color: #f87171;">[Chương IV - Sec 4.5] Rơ-le an toàn PNOZ X3 chọn sai điện áp (230VAC vs 24VDC)</strong>
+                        <p style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">Hệ thống dùng nguồn 24VDC nhưng rơ-le cuộn dây ghi 230VAC $\rightarrow$ Cuộn dây không đóng, nút E-Stop không hoạt động.</p>
+                    </div>
+                </li>
+                <li class="priority-item">
+                    <div class="num-circle">3</div>
+                    <div>
+                        <strong style="color: #f87171;">[Chương III - Eq. 3.3 & 3.4] Sai mẫu số công thức tính góc phân tách tối thiểu $\delta_{\text{min}}$</strong>
+                        <p style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">Thiếu bình phương $2R_b^2$, dẫn đến góc tính ra $43.9^\circ$ bị ghi nhầm thành $41.7^\circ$.</p>
+                    </div>
+                </li>
+                <li class="priority-item">
+                    <div class="num-circle">4</div>
+                    <div>
+                        <strong style="color: #f87171;">[Chương III - Bảng 3.8.1] Lỗi gõ nhầm hàng Surge: $T_{\text{max}} = 35.85\text{ N.m}$</strong>
+                        <p style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">Tmax quá lớn bất thường do copy nhầm từ cột tốc độ $\omega = 35.85\text{ Rps}$. Giá trị đúng xấp xỉ $0.208\text{ N.m}$.</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- ==================== CHƯƠNG III ==================== -->
+        <div class="chapter-section">
+            <div class="chapter-title">
+                <span>CHƯƠNG III: THIẾT KẾ CƠ KHÍ</span>
+                <span style="font-size: 13px; color: var(--text-muted); font-weight: normal;">4 Lỗi nghiêm trọng | 7 Cần xem lại | 3 Đánh giá tốt</span>
+            </div>
+
+            <!-- Card 1: Eq 3.3 & 3.4 -->
+            <div class="issue-card critical">
+                <div class="issue-header">
+                    <div class="issue-title">
+                        <span class="badge critical">Lỗi nghiêm trọng</span>
+                        <span>Sai cấu trúc công thức góc phân tách tối thiểu $\delta_{\text{min}}$</span>
+                    </div>
+                    <span class="issue-loc">Chương III - Mục 3.1 (Eq. 3.3 & 3.4)</span>
+                </div>
+                <div class="issue-body">
+                    <div class="box-problem">
+                        <div class="box-title">Vấn đề hiện tại (Lỗi)</div>
+                        <p>Mẫu số công thức viết là <span class="diff-remove">2 &times; &radic;(147&sup2; + 56&sup2;)</span> bị thiếu dấu bình phương ngoài. Dấu căn bị triệt tiêu sai dẫn đến góc tính ra 41.7&deg; trong báo cáo là sai.</p>
+                        <div class="code-block">Eq. 3.3 sai: delta_b_min = cos^-1(1 - 112^2 / (2 * sqrt(147^2 + 56^2)))</div>
+                    </div>
+                    <div class="box-solution">
+                        <div class="box-title">Cách sửa chi tiết</div>
+                        <p>Viết lại mẫu số là <span class="diff-add">2 &times; Rb&sup2; = 2 &times; (147&sup2; + 28&sup2;) = 44,800 mm&sup2;</span>.</p>
+                        <div class="code-block">% Sửa trong LaTeX:
+\delta_{b,\text{min}} = \arccos\left(1 - \frac{112^2}{2 \cdot R_b^2}\right) = \arccos\left(1 - \frac{12544}{44800}\right) = 43.9^\circ</div>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 6px;">Cần cập nhật góc &delta;b_min thành 43.9&deg; và thực hiện tương tự cho Eq. 3.4 (&delta;p_min).</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Eq 3.15 -->
+            <div class="issue-card critical">
+                <div class="issue-header">
+                    <div class="issue-title">
+                        <span class="badge critical">Lỗi nghiêm trọng</span>
+                        <span>Đơn vị gia tốc không nhất quán trong công thức tải</span>
+                    </div>
+                    <span class="issue-loc">Chương III - Mục 3.2 (Eq. 3.15)</span>
+                </div>
+                <div class="issue-body">
+                    <div class="box-problem">
+                        <div class="box-title">Vấn đề hiện tại (Lỗi)</div>
+                        <p>Ở Mục 3.1 khai báo <span class="diff-remove">amax = 44.75327 cm/s&sup2;</span>. Khi thế vào Eq. 3.15 dùng <span class="diff-add">a = 0.4476 m/s&sup2;</span> nhưng không ghi rõ dòng quy đổi đơn vị làm người đọc hiểu nhầm.</p>
+                    </div>
+                    <div class="box-solution">
+                        <div class="box-title">Cách sửa chi tiết</div>
+                        <p>Thêm dòng chuyển đổi đơn vị rõ ràng ngay trước khi áp dụng công thức Eq. 3.15.</p>
+                        <div class="code-block">Gia tốc cực đại quy đổi: 
+amax = 44.76 cm/s² = 0.4476 m/s²
+Fa1 = m(g + a) + f = 5 * (9.8 + 0.4476) + 15 = 66.238 N</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: Eq 3.23 -->
+            <div class="issue-card critical">
+                <div class="issue-header">
+                    <div class="issue-title">
+                        <span class="badge critical">Lỗi nghiêm trọng</span>
+                        <span>Công thức tải oằn trục vít me bi (Euler Buckling) dùng sai hệ số</span>
+                    </div>
+                    <span class="issue-loc">Chương III - Mục 3.2b (Eq. 3.23)</span>
+                </div>
+                <div class="issue-body">
+                    <div class="box-problem">
+                        <div class="box-title">Vấn đề hiện tại (Lỗi)</div>
+                        <p>Eq. 3.23 dùng công thức kinh nghiệm <span class="diff-remove">P1 = &eta;2 &times; (d1⁴/la&sup2;) &times; 10⁴</span> với &eta;2 = 10 (Fixed-Supported). Tuy nhiên d1=9.2 mm là đường kính đáy ren. Kết quả P1=12,863 N quá lớn so với Fmax=66.24 N.</p>
+                    </div>
+                    <div class="box-solution">
+                        <div class="box-title">Cách sửa chi tiết</div>
+                        <p>Bổ sung trích dẫn nguồn tra bảng THK hoặc dùng công thức Euler chính ngạch có tính đến hệ số ngàm-tựa.</p>
+                        <div class="code-block">P_{cr} = n \cdot \frac{\pi^2 \cdot E \cdot I}{L_a^2} 
+Trong đó n = 2 (Fixed-Supported), d_1 = 9.2 mm, L_a = 236 mm. 
+Kết quả P1 = 12,863 N >> Fmax = 66.24 N (Hệ số an toàn k = 194).</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4: Bảng 3.8.1 -->
+            <div class="issue-card critical">
+                <div class="issue-header">
+                    <div class="issue-title">
+                        <span class="badge critical">Lỗi nghiêm trọng</span>
+                        <span>Nhầm lẫn dữ liệu hàng Surge trong Bảng 3.8.1</span>
+                    </div>
+                    <span class="issue-loc">Chương III - Mục 3.8 (Bảng 3.8.1)</span>
+                </div>
+                <div class="issue-body">
+                    <div class="box-problem">
+                        <div class="box-title">Vấn đề hiện tại (Lỗi)</div>
+                        <p>Hàng Surge ghi <span class="diff-remove">Tmax = 35.8500 N.m</span>. Giá trị này quá vô lý (gấp 150 lần các hàng khác &approx; 0.2 N.m). Đây là do copy nhầm từ cột &omega; = 35.8500 Rps.</p>
+                    </div>
+                    <div class="box-solution">
+                        <div class="box-title">Cách sửa chi tiết</div>
+                        <p>Kiểm tra file Excel tính toán gốc và sửa lại ô Tmax hàng Surge thành giá trị đúng.</p>
+                        <div class="code-block">Hàng Surge (Sửa lại):
+Tmax = 0.208 N.m (hoặc 0.2081 N.m)
+omega = 35.8500 Rps
+Tm = 0.208 N.m</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 5: items to review in Chap 3 -->
+            <div class="issue-card warning">
+                <div class="issue-header">
+                    <div class="issue-title">
+                        <span class="badge warning">Cần xem lại</span>
+                        <span>Thiếu định nghĩa rj, jm và khai báo tham số db, dp</span>
+                    </div>
+                    <span class="issue-loc">Chương III - Mục 3.1 (Eq. 3.1)</span>
+                </div>
+                <div class="issue-body">
+                    <div class="box-problem">
+                        <div class="box-title">Vấn đề hiện tại</div>
+                        <p>Công thức rmin = (2rj + jm)/(2.sin120&deg;) = 112 / ... xuất hiện mà không khai báo rj (bán kính khớp) và jm (khoảng cách 2 khớp). Khai báo ngầm db=56mm, dp=38mm thiếu giải thích.</p>
+                    </div>
+                    <div class="box-solution">
+                        <div class="box-title">Cách sửa chi tiết</div>
+                        <p>Thêm đoạn định nghĩa tham số trước Eq. 3.1:</p>
+                        <div class="code-block">Khai báo: rj = 50 mm, jm = 12 mm => 2*rj + jm = 112 mm
+Liệt kê cùng bảng kích thước: rb = 147 mm, rp = 68 mm, db = 56 mm, dp = 38 mm.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== CHƯƠNG IV ==================== -->
+        <div class="chapter-section">
+            <div class="chapter-title">
+                <span>CHƯƠNG IV: HỆ THỐNG ĐIỆN</span>
+                <span style="font-size: 13px; color: var(--text-muted); font-weight: normal;">2 Lỗi nghiêm trọng | 4 Cần xem lại | 2 Đánh giá tốt</span>
+            </div>
+
+            <!-- Card: Relay PNOZ X3 -->
+            <div class="issue-card critical">
+                <div class="issue-header">
+                    <div class="issue-title">
+                        <span class="badge critical">Lỗi nghiêm trọng</span>
+                        <span>Relay an toàn PNOZ X3 sai điện áp cuộn dây (230VAC vs 24VDC)</span>
+                    </div>
+                    <span class="issue-loc">Chương IV - Mục 4.5 (Mạch E-Stop)</span>
+                </div>
+                <div class="issue-body">
+                    <div class="box-problem">
+                        <div class="box-title">Vấn đề hiện tại (Lỗi nghiêm trọng)</div>
+                        <p>Báo cáo ghi chọn <span class="diff-remove">PNOZ X3 230VAC 24VDC</span>. Nếu dùng phiên bản cuộn dây 230VAC cấp nguồn 24VDC thì cuộn dây Rơ-le sẽ không đóng $\rightarrow$ Mạch E-Stop không thể hoạt động!</p>
+                    </div>
+                    <div class="box-solution">
+                        <div class="box-title">Cách sửa chi tiết</div>
+                        <p>Đổi mã rơ-le thành phiên bản thuần nguồn 24VDC chuẩn công nghiệp.</p>
+                        <div class="code-block">Sửa lại mã Relay:
+- Chọn Relay an toàn PNOZ X2.8P 24VDC (Mã PILZ 777301) 
+- Hoặc PNOZ X3 24VDC (Mã PILZ 774310)
+- Nút dừng khẩn cấp: Chint NP2-ES542 (NC Contact)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card: Flash Typo -->
+            <div class="issue-card warning">
+                <div class="issue-header">
+                    <div class="issue-title">
+                        <span class="badge warning">Cần xem lại</span>
+                        <span>Lỗi Typography dung lượng Flash STM32F446ZE</span>
+                    </div>
+                    <span class="issue-loc">Chương IV - Bảng 4.6.1.3</span>
+                </div>
+                <div class="issue-body">
+                    <div class="box-problem">
+                        <div class="box-title">Vấn đề hiện tại</div>
+                        <p>Bảng 4.6.1.3 ghi <span class="diff-remove">180 MHz / 128 KB</span> cho Flash. Đây là lỗi nhầm lẫn dòng với SRAM.</p>
+                    </div>
+                    <div class="box-solution">
+                        <div class="box-title">Cách sửa chi tiết</div>
+                        <p>Sửa lại bảng thông số kỹ thuật chuẩn của chip STM32F446ZET6:</p>
+                        <div class="code-block">Bảng 4.6.1.3 (Sửa lại):
+Flash Memory = 512 KB
+SRAM = 128 KB SRAM
+Tần số tối đa = 180 MHz</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== CHƯƠNG V ==================== -->
+        <div class="chapter-section">
+            <div class="chapter-title">
+                <span>CHƯƠNG V: THIẾT KẾ BỘ ĐIỀU KHIỂN</span>
+                <span style="font-size: 13px; color: var(--text-muted); font-weight: normal;">1 Lỗi nghiêm trọng | 2 Cần xem lại | 1 Đánh giá tốt</span>
+            </div>
+
+            <!-- Card: Eq 5.8 Delta_i -->
+            <div class="issue-card critical">
+                <div class="issue-header">
+                    <div class="issue-title">
+                        <span class="badge critical">Lỗi nghiêm trọng</span>
+                        <span>Công thức Động học nghịch $\Delta_i$ bị sai dấu căn kép</span>
+                    </div>
+                    <span class="issue-loc">Chương V - Mục 5.1 (Eq. 5.8 & Eq. 3.8)</span>
+                </div>
+                <div class="issue-body">
+                    <div class="box-problem">
+                        <div class="box-title">Vấn đề hiện tại (Lỗi nghiêm trọng)</div>
+                        <p>Công thức viết <span class="diff-remove">&Delta;i = &radic;(L&sup2; - &radic;(qi,x&sup2; + qi,y&sup2;))</span> có hai dấu căn lồng nhau. Đây là lỗi đánh máy nghiêm trọng. Nếu code C/Python/MATLAB viết theo công thức này thì toàn bộ vị trí con trượt sẽ bị sai!</p>
+                    </div>
+                    <div class="box-solution">
+                        <div class="box-title">Cách sửa chi tiết</div>
+                        <p>Bỏ dấu căn trong và sửa lại thành bình phương chuẩn:</p>
+                        <div class="code-block">% Sửa công thức Eq. 5.8 & Eq. 3.8 trong LaTeX:
+\Delta_i = \sqrt{L^2 - (q_{i,x}^2 + q_{i,y}^2)}
+
+Kiểm tra ngay file code C (main.c/kinematics.c) và Python/MATLAB:
+delta_i = math.sqrt(L**2 - (q_ix**2 + q_iy**2))</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== CHƯƠNG VI ==================== -->
+        <div class="chapter-section">
+            <div class="chapter-title">
+                <span>CHƯƠNG VI: GIẢI THUẬT HỆ THỐNG</span>
+                <span style="font-size: 13px; color: var(--text-muted); font-weight: normal;">1 Lỗi nghiêm trọng | 1 Cần xem lại | 0 Đánh giá tốt</span>
+            </div>
+
+            <!-- Card: CPU Time budget -->
+            <div class="issue-card critical">
+                <div class="issue-header">
+                    <div class="issue-title">
+                        <span class="badge critical">Lỗi nghiêm trọng</span>
+                        <span>Bộ đệm kép: Thiếu phân tích Worst-case CPU Time Budget</span>
+                    </div>
+                    <span class="issue-loc">Chương VI - Mục 6.2</span>
+                </div>
+                <div class="issue-body">
+                    <div class="box-problem">
+                        <div class="box-title">Vấn đề hiện tại</div>
+                        <p>Trong 5ms (1000 DDA ticks @ 200kHz), CPU phải pre-compute 1000 &times; 6 = 6000 phép tính DDA. Báo cáo chưa tính toán tổng thời gian CPU dành cho ngắt USB, ngắt DMA ISR và Context switch để chứng minh không bị lỡ deadline 5ms.</p>
+                    </div>
+                    <div class="box-solution">
+                        <div class="box-title">Cách sửa chi tiết</div>
+                        <p>Bổ sung Bảng phân tích ngân sách thời gian CPU (CPU Time Budget) trong 5ms:</p>
+                        <div class="code-block">Bảng Ngân Sách Thời Gian CPU (Trong 5ms = 5000 us):
+1. Pre-compute 1000 DDA x 6 trục: ~33 us (6000 ops @ 180MHz)
+2. USB Interrupt Service Routine: ~15 us
+3. DMA Stream5 Transfer Complete ISR: ~5 us
+4. Context Switch & Safety Overhead: ~10 us
+=> TỔNG THỜI GIAN CPU CHẠY: 63 us << 5000 us (Hệ số an toàn Margin = 79 lần!)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card: Homing Timeout -->
+            <div class="issue-card warning">
+                <div class="issue-header">
+                    <div class="issue-title">
+                        <span class="badge warning">Cần xem lại</span>
+                        <span>Lưu đồ Homing thiếu nhánh Timeout và xử lý lỗi</span>
+                    </div>
+                    <span class="issue-loc">Chương VI - Mục 6.3 (Hình 6.3.1)</span>
+                </div>
+                <div class="issue-body">
+                    <div class="box-problem">
+                        <div class="box-title">Vấn đề hiện tại</div>
+                        <p>Lưu đồ Homing không có nhánh kiểm tra Timeout. Nếu cảm biến tiệm cận hỏng hoặc kẹt cơ khí, động cơ sẽ phát xung mãi mãi gây ngắt kẹt hành trình.</p>
+                    </div>
+                    <div class="box-solution">
+                        <div class="box-title">Cách sửa chi tiết</div>
+                        <p>Cập nhật Lưu đồ Homing thêm vòng đếm thời gian Timeout > 10s:</p>
+                        <div class="code-block">Thêm nhánh: NẾU t_homing > 10s -> BÁO LỖI (Homing Timeout Error) -> DỪNG MOTOR -> TRỞ VỀ</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            Báo cáo tổng hợp kế hoạch sửa lỗi dựa trên file <strong>RaSoatKyThuat.pdf</strong> | Hệ thống Stewart Platform 6-PUS
+        </footer>
+    </div>
+
+    <script>
+        function filterIssues(type) {
+            // Toggle active button
+            const buttons = document.querySelectorAll('.btn-filter');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Filter issue cards
+            const cards = document.querySelectorAll('.issue-card');
+            cards.forEach(card => {
+                if (type === 'all') {
+                    card.style.display = 'block';
+                } else if (type === 'critical' && card.classList.contains('critical')) {
+                    card.style.display = 'block';
+                } else if (type === 'warning' && card.classList.contains('warning')) {
+                    card.style.display = 'block';
+                } else if (type === 'good' && card.classList.contains('good')) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

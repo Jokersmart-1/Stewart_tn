@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tính toán Dòng điện & Công suất Động cơ</title>
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-hover: #4338CA;
+            --bg-color: #0F172A;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
+            --accent: #10B981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.15) 0px, transparent 50%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .container {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-align: center;
+            background: linear-gradient(135deg, #A5B4FC, #818CF8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .input-group.full-width {
+            grid-column: span 2;
+        }
+
+        label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #CBD5E1;
+        }
+
+        input {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-main);
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.25);
+        }
+
+        button {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 2rem;
+        }
+
+        button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .results {
+            background: rgba(15, 23, 42, 0.4);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .result-value {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .result-value.highlight {
+            font-size: 1.5rem;
+            color: #60A5FA;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tính Toán Điện Năng Động Cơ</h1>
+        <p class="subtitle">Nội suy dòng điện theo phương pháp tải thực tế dựa trên đồ thị</p>
+
+        <div class="form-grid">
+            <div class="input-group">
+                <label for="reqTorque">Moment yêu cầu (N.m)</label>
+                <input type="number" id="reqTorque" step="0.001" value="0.113">
+            </div>
+            <div class="input-group">
+                <label for="voltage">Điện áp nguồn (V)</label>
+                <input type="number" id="voltage" step="1" value="24">
+            </div>
+            <div class="input-group">
+                <label for="fullTorque">Moment Full Load (N.m)</label>
+                <input type="number" id="fullTorque" step="0.01" value="0.35">
+            </div>
+            <div class="input-group">
+                <label for="fullCurrent">Dòng Full Load (A)</label>
+                <input type="number" id="fullCurrent" step="0.1" value="4.1">
+            </div>
+            <div class="input-group full-width">
+                <label for="noLoadCurrent">Dòng Không Tải / No Load (A)</label>
+                <input type="number" id="noLoadCurrent" step="0.1" value="0.9">
+            </div>
+        </div>
+
+        <button onclick="calculate()">Tính Toán</button>
+
+        <div class="results">
+            <div class="result-item">
+                <span class="result-label">Tỷ lệ tải</span>
+                <span class="result-value" id="resRatio">32.29 %</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Dòng điện ước tính (1 động cơ)</span>
+                <span class="result-value highlight" id="resCurrent">1.93 A</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Công suất tối đa (1 động cơ)</span>
+                <span class="result-value" id="resPower1">46.40 W</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Công suất tổng (6 động cơ)</span>
+                <span class="result-value" id="resPower6">278.40 W</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculate() {
+            const reqTorque = parseFloat(document.getElementById('reqTorque').value);
+            const fullTorque = parseFloat(document.getElementById('fullTorque').value);
+            const fullCurrent = parseFloat(document.getElementById('fullCurrent').value);
+            const noLoadCurrent = parseFloat(document.getElementById('noLoadCurrent').value);
+            const voltage = parseFloat(document.getElementById('voltage').value);
+
+            if (isNaN(reqTorque) || isNaN(fullTorque) || isNaN(fullCurrent) || isNaN(noLoadCurrent) || isNaN(voltage)) {
+                alert("Vui lòng nhập đầy đủ các số liệu hợp lệ.");
+                return;
+            }
+
+            if (fullTorque <= 0) {
+                alert("Moment Full Load phải lớn hơn 0.");
+                return;
+            }
+
+            let ratio = reqTorque / fullTorque;
+            if (ratio > 1) ratio = 1; // Giới hạn max 100%
+            if (ratio < 0) ratio = 0;
+
+            const estCurrent = noLoadCurrent + ratio * (fullCurrent - noLoadCurrent);
+            const estPower1 = estCurrent * voltage;
+            const estPower6 = estPower1 * 6;
+
+            document.getElementById('resRatio').innerText = (ratio * 100).toFixed(2) + ' %';
+            document.getElementById('resCurrent').innerText = estCurrent.toFixed(2) + ' A';
+            document.getElementById('resPower1').innerText = estPower1.toFixed(2) + ' W';
+            document.getElementById('resPower6').innerText = estPower6.toFixed(2) + ' W';
+        }
+        
+        // Calculate on load
+        calculate();
+    </script>
+</body>
+</html>

@@ -1,0 +1,3170 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  
+  <!-- Apple iOS Safari & PWA Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Stewart 6-DOF">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="theme-color" content="#0a0f1d">
+  
+  <title>BÁO CÁO ĐỒ ÁN TỐT NGHIỆP - HỆ STEWART PLATFORM 6-DOF</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- MathJax Configuration & Script -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    :root {
+      --bg-main: #0a0f1d;
+      --bg-card: #131b2e;
+      --bg-card-hover: #1c2640;
+      --bg-surface: #1e293b;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --primary: #38bdf8;
+      --primary-glow: rgba(56, 189, 248, 0.25);
+      --secondary: #818cf8;
+      --accent: #06b6d4;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --border: #334155;
+      --border-light: rgba(255, 255, 255, 0.08);
+      --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-code: 'JetBrains Mono', Menlo, monospace;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left: env(safe-area-inset-left, 0px);
+      --safe-right: env(safe-area-inset-right, 0px);
+    }
+
+    [data-theme="light"] {
+      --bg-main: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-card-hover: #f1f5f9;
+      --bg-surface: #e2e8f0;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --text-dim: #94a3b8;
+      --primary: #0284c7;
+      --primary-glow: rgba(2, 132, 199, 0.15);
+      --secondary: #6366f1;
+      --accent: #0891b2;
+      --success: #059669;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --border: #cbd5e1;
+      --border-light: rgba(0, 0, 0, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      min-height: 100%;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      padding-top: var(--safe-top);
+      padding-bottom: var(--safe-bottom);
+      padding-left: var(--safe-left);
+      padding-right: var(--safe-right);
+    }
+
+    /* Top Navigation Header */
+    header.defense-header {
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .project-branding {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .robot-badge {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.85rem;
+      padding: 6px 12px;
+      border-radius: 8px;
+      box-shadow: 0 0 15px var(--primary-glow);
+    }
+
+    .project-title-box h1 {
+      font-family: var(--font-heading);
+      font-size: 1.05rem;
+      font-weight: 700;
+      background: linear-gradient(to right, #38bdf8, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1.2;
+    }
+
+    .project-title-box p {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    /* Nav Tabs with Horizontal Scrolling on iPhone */
+    .nav-tabs {
+      display: flex;
+      background: var(--bg-surface);
+      padding: 4px;
+      border-radius: 12px;
+      gap: 4px;
+      border: 1px solid var(--border);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .nav-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .nav-tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 0.82rem;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      transition: all 0.25s ease;
+      min-height: 38px;
+    }
+
+    .nav-tab-btn:hover, .nav-tab-btn:active {
+      color: var(--text-main);
+    }
+
+    .nav-tab-btn.active {
+      background: var(--primary);
+      color: #04101e;
+      font-weight: 700;
+      box-shadow: 0 2px 10px var(--primary-glow);
+    }
+
+    /* Header Actions */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .defense-timer-widget {
+      display: flex;
+      align-items: center;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 4px 8px;
+      gap: 6px;
+    }
+
+    .timer-display {
+      font-family: var(--font-code);
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--primary);
+      min-width: 50px;
+      text-align: center;
+    }
+
+    .timer-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px 6px;
+      font-size: 0.8rem;
+      border-radius: 4px;
+    }
+
+    .btn-icon {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    /* Main Container */
+    main.content-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      width: 100%;
+    }
+
+    .view-panel {
+      display: none;
+      flex: 1;
+      width: 100%;
+    }
+
+    .view-panel.active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* =========================================================
+       1. SLIDE PRESENTATION VIEW
+       ========================================================= */
+    #slide-view {
+      padding: 16px;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      background: radial-gradient(circle at center, #111a33 0%, var(--bg-main) 100%);
+      min-height: calc(100vh - 65px);
+      touch-action: pan-y; /* Cho phép cuộn dọc tự nhiên nhưng bắt vuốt ngang chuyển slide */
+    }
+
+    #slide-view.active {
+      display: flex;
+    }
+
+    .slide-viewport {
+      width: 100%;
+      max-width: 1180px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-height: 520px;
+      overflow: hidden;
+    }
+
+    @media (min-width: 901px) {
+      .slide-viewport {
+        aspect-ratio: 16 / 9;
+        height: auto;
+      }
+    }
+
+    .slide-content-container {
+      flex: 1;
+      padding: 24px 30px 16px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .slide-header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border-light);
+      padding-bottom: 10px;
+      gap: 10px;
+    }
+
+    .slide-category-tag {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--primary);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .slide-title {
+      font-family: var(--font-heading);
+      font-size: 1.55rem;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.25;
+    }
+
+    .slide-badge-num {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      color: var(--secondary);
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    .slide-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      font-size: 0.98rem;
+      line-height: 1.6;
+    }
+
+    /* Grid Layouts for Slide Content */
+    .slide-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .slide-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .slide-card {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      padding: 14px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .slide-card-title {
+      font-family: var(--font-heading);
+      font-size: 1.02rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .highlight-box {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(129, 140, 248, 0.08));
+      border-left: 4px solid var(--primary);
+      border-radius: 0 10px 10px 0;
+      padding: 10px 14px;
+      margin: 6px 0;
+    }
+
+    .alert-box {
+      background: rgba(239, 68, 68, 0.12);
+      border-left: 4px solid var(--danger);
+      border-radius: 0 10px 10px 0;
+      padding: 10px 14px;
+      font-size: 0.92rem;
+    }
+
+    .success-box {
+      background: rgba(16, 185, 129, 0.12);
+      border-left: 4px solid var(--success);
+      border-radius: 0 10px 10px 0;
+      padding: 10px 14px;
+      font-size: 0.92rem;
+    }
+
+    ul.bullet-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    ul.bullet-list li {
+      position: relative;
+      padding-left: 20px;
+    }
+
+    ul.bullet-list li::before {
+      content: "▹";
+      position: absolute;
+      left: 0;
+      color: var(--primary);
+      font-weight: bold;
+      font-size: 1.05rem;
+    }
+
+    /* Scrollable Engineering Tables */
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin: 6px 0;
+    }
+
+    table.slide-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      min-width: 320px;
+    }
+
+    table.slide-table th {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--primary);
+      font-weight: 700;
+      padding: 8px 10px;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+
+    table.slide-table td {
+      padding: 7px 10px;
+      border: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.4);
+    }
+
+    /* Metric Badges */
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 10px;
+      margin: 6px 0;
+    }
+
+    .metric-pill {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px;
+      text-align: center;
+    }
+
+    .metric-value {
+      font-family: var(--font-heading);
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .metric-label {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+      text-transform: uppercase;
+    }
+
+    /* Flow Step Pills */
+    .flow-steps {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin: 8px 0;
+    }
+
+    .flow-step {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .flow-step.active {
+      border-color: var(--primary);
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--primary);
+    }
+
+    .flow-arrow {
+      color: var(--text-dim);
+      font-size: 0.8rem;
+    }
+
+    /* Slide Controls Footer */
+    .slide-footer-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 16px;
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border);
+      gap: 10px;
+    }
+
+    .slide-progress-bar-bg {
+      flex: 1;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .slide-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      width: 3.33%;
+      transition: width 0.3s ease;
+    }
+
+    .slide-ctrl-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 40px;
+      touch-action: manipulation;
+    }
+
+    .slide-ctrl-btn:active {
+      background: var(--primary);
+      color: #04101e;
+    }
+
+    /* Quick Speaker Note Drawer */
+    .speaker-note-drawer {
+      margin-top: 12px;
+      width: 100%;
+      max-width: 1180px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .drawer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--secondary);
+    }
+
+    .speaker-note-text {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .speaker-note-text strong {
+      color: var(--text-main);
+    }
+
+    /* =========================================================
+       2. SPEAKER PROMPTER & SCRIPT VIEW
+       ========================================================= */
+    #script-view {
+      padding: 16px;
+      max-width: 1100px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .script-header-card {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(129, 140, 248, 0.05));
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .script-card-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+
+    .script-card-item.active {
+      border-color: var(--primary);
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.15);
+    }
+
+    .script-slide-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--primary);
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-bottom: 8px;
+    }
+
+    .script-speech-content {
+      font-size: 0.95rem;
+      line-height: 1.65;
+      color: var(--text-main);
+      background: rgba(15, 23, 42, 0.5);
+      border-radius: 10px;
+      padding: 12px 16px;
+      border-left: 3px solid var(--primary);
+      margin: 8px 0;
+    }
+
+    .defense-key-points {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .defense-point-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 0.85rem;
+    }
+
+    /* =========================================================
+       3. DEFENSE SIMULATION & QA VIEW
+       ========================================================= */
+    #qa-view {
+      padding: 16px;
+      max-width: 1100px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .qa-toolbar {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .qa-search-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .qa-search-input {
+      flex: 1;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      font-size: 0.92rem;
+      padding: 8px 14px;
+      border-radius: 10px;
+      outline: none;
+      min-height: 40px;
+    }
+
+    .qa-filter-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .filter-chip {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      white-space: nowrap;
+      min-height: 32px;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .filter-chip.active {
+      background: var(--primary);
+      color: #04101e;
+      font-weight: 700;
+      border-color: var(--primary);
+    }
+
+    .qa-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+
+    .qa-card-header {
+      padding: 14px 16px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      background: rgba(30, 41, 59, 0.4);
+      user-select: none;
+      min-height: 48px;
+    }
+
+    .qa-committee-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 6px;
+      margin-bottom: 4px;
+    }
+
+    .tag-mech { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+    .tag-elec { background: rgba(56, 189, 248, 0.2); color: #38bdf8; }
+    .tag-clock { background: rgba(236, 72, 153, 0.2); color: #f472b6; }
+    .tag-firmware { background: rgba(168, 85, 247, 0.2); color: #c084fc; }
+    .tag-sdio { background: rgba(14, 165, 233, 0.2); color: #38bdf8; }
+    .tag-usb { background: rgba(168, 85, 247, 0.2); color: #c084fc; }
+    .tag-cycle { background: rgba(234, 179, 8, 0.2); color: #eab308; }
+    .tag-homing { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    .tag-sim { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+
+    .qa-question-text {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.35;
+    }
+
+    .qa-intent-text {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      font-style: italic;
+    }
+
+    .qa-expand-icon {
+      font-size: 1rem;
+      color: var(--primary);
+      transition: transform 0.3s;
+      margin-top: 4px;
+    }
+
+    .qa-card.open .qa-expand-icon {
+      transform: rotate(180deg);
+    }
+
+    .qa-card-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease-out, padding 0.3s ease;
+      background: var(--bg-card);
+      padding: 0 16px;
+    }
+
+    .qa-card.open .qa-card-body {
+      max-height: 4500px;
+      padding: 16px;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .qa-strategy-box {
+      background: rgba(129, 140, 248, 0.1);
+      border-left: 4px solid var(--secondary);
+      padding: 8px 12px;
+      border-radius: 0 8px 8px 0;
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      margin-bottom: 10px;
+    }
+
+    .qa-answer-text {
+      font-size: 0.92rem;
+      line-height: 1.65;
+      color: var(--text-main);
+    }
+
+    .qa-answer-text ul {
+      margin: 6px 0 6px 16px;
+    }
+
+    .code-block {
+      background: #090d16;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-family: var(--font-code);
+      font-size: 0.82rem;
+      color: #38bdf8;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin: 6px 0;
+    }
+
+    /* =========================================================
+       4. QUICK ENGINEERING CHEATSHEET VIEW
+       ========================================================= */
+    #cheatsheet-view {
+      padding: 16px;
+      max-width: 1100px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .cheatsheet-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+    }
+
+    /* Modal for Slide Grid Overview */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 15, 29, 0.94);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      max-width: 1000px;
+      width: 100%;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-body {
+      padding: 16px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+    }
+
+    .slide-thumb-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      cursor: pointer;
+    }
+
+    .slide-thumb-card.active {
+      border-color: var(--primary);
+      background: rgba(56, 189, 248, 0.15);
+    }
+
+    /* Mobile Responsive Rules for iPhone */
+    @media (max-width: 768px) {
+      header.defense-header {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 8px 12px;
+        gap: 8px;
+      }
+
+      .project-branding {
+        justify-content: space-between;
+      }
+
+      .slide-grid-2, .slide-grid-3, .defense-key-points {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .slide-content-container {
+        padding: 16px 14px;
+      }
+
+      .slide-title {
+        font-size: 1.25rem;
+      }
+
+      .slide-header-bar {
+        flex-direction: column-reverse;
+        align-items: flex-start;
+        gap: 6px;
+      }
+
+      .slide-badge-num {
+        font-size: 0.75rem;
+        padding: 3px 8px;
+      }
+
+      .modal-body {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body data-theme="dark">
+
+  <!-- ==================== TOP NAVIGATION HEADER ==================== -->
+  <header class="defense-header">
+    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+      <div class="project-branding">
+        <div class="robot-badge"><i class="fa-solid fa-cube"></i> 6-PUS</div>
+        <div class="project-title-box">
+          <h1>BÁO CÁO ĐỒ ÁN TỐT NGHIỆP</h1>
+          <p>Stewart 6-DOF mô phỏng xà lan trên biển</p>
+        </div>
+      </div>
+
+      <!-- Header Tools & Timer -->
+      <div class="header-actions">
+        <div class="defense-timer-widget">
+          <i class="fa-solid fa-stopwatch" style="color: var(--primary); font-size: 0.85rem;"></i>
+          <div class="timer-display" id="defenseTimer">20:00</div>
+          <button class="timer-btn" onclick="toggleTimer()" id="timerToggleBtn" title="Bắt đầu/Tạm dừng"><i class="fa-solid fa-play"></i></button>
+          <button class="timer-btn" onclick="resetTimer()" title="Đặt lại 20 phút"><i class="fa-solid fa-rotate-left"></i></button>
+        </div>
+
+        <button class="btn-icon" onclick="openSlideGrid()" title="Mục lục (O)">
+          <i class="fa-solid fa-grid-2"></i>
+        </button>
+        <button class="btn-icon" onclick="toggleFullScreen()" title="Toàn màn hình (F)">
+          <i class="fa-solid fa-expand"></i>
+        </button>
+        <button class="btn-icon" onclick="toggleTheme()" title="Đổi giao diện">
+          <i class="fa-solid fa-moon-stars" id="themeIcon"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Mode Tabs -->
+    <div class="nav-tabs">
+      <button class="nav-tab-btn active" onclick="switchView('slide-view')">
+        <i class="fa-solid fa-chalkboard-user"></i> 30 Slides
+      </button>
+      <button class="nav-tab-btn" onclick="switchView('script-view')">
+        <i class="fa-solid fa-microphone-lines"></i> Kịch Bản
+      </button>
+      <button class="nav-tab-btn" onclick="switchView('qa-view')">
+        <i class="fa-solid fa-comments-question-check"></i> Phản Biện (Q&A)
+      </button>
+      <button class="nav-tab-btn" onclick="switchView('cheatsheet-view')">
+        <i class="fa-solid fa-table-list"></i> Thông Số
+      </button>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN CONTENT AREA ==================== -->
+  <main class="content-area">
+
+    <!-- ==================== 1. SLIDE PRESENTATION VIEW ==================== -->
+    <section id="slide-view" class="view-panel active">
+      <div class="slide-viewport" id="slideViewport">
+        <div class="slide-content-container" id="slideContainer">
+          <!-- Slide Dynamic Content Injected by JS -->
+        </div>
+
+        <!-- Slide Footer Controls -->
+        <div class="slide-footer-controls">
+          <button class="slide-ctrl-btn" onclick="prevSlide()">
+            <i class="fa-solid fa-arrow-left"></i> Trước
+          </button>
+
+          <div class="slide-progress-bar-bg" onclick="handleProgressBarClick(event)" title="Nhấp để nhảy đến slide">
+            <div class="slide-progress-fill" id="slideProgressFill"></div>
+          </div>
+
+          <span style="font-family: var(--font-code); font-weight: bold; color: var(--primary); font-size: 0.85rem;" id="slideCounterLabel">1 / 30</span>
+
+          <button class="slide-ctrl-btn" onclick="nextSlide()">
+            Sau <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Speaker Note Drawer -->
+      <div class="speaker-note-drawer">
+        <div class="drawer-header">
+          <span><i class="fa-solid fa-comment-dots"></i> LỜI BÌNH BÁO CÁO & MẸO PHẢN BIỆN:</span>
+          <span style="font-size: 0.75rem; color: var(--text-muted);"><i class="fa-solid fa-hand-pointer"></i> Vuốt trái/phải để chuyển slide</span>
+        </div>
+        <div class="speaker-note-text" id="quickSpeakerNote">
+          <!-- Note injected by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 2. SPEAKER SCRIPT & PROMPTER VIEW ==================== -->
+    <section id="script-view" class="view-panel">
+      <div class="script-header-card">
+        <div>
+          <h2 style="font-family: var(--font-heading); color: #fff; font-size: 1.25rem;">🎙️ KỊCH BẢN THUYẾT TRÌNH GIẢ ĐỊNH 20 PHÚT</h2>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">
+            Lời thoại chuẩn mực, tự tin, nhấn mạnh số liệu thực nghiệm và giải quyết trúng tâm lý Hội đồng.
+          </p>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button class="slide-ctrl-btn" onclick="startPrompterMode()"><i class="fa-solid fa-play"></i> Cuộn Tự Động</button>
+          <button class="slide-ctrl-btn" onclick="filterScriptCurrent()"><i class="fa-solid fa-crosshairs"></i> Về Slide Đang Xem</button>
+        </div>
+      </div>
+
+      <div id="scriptContainer">
+        <!-- Script cards injected by JS -->
+      </div>
+    </section>
+
+    <!-- ==================== 3. DEFENSE SIMULATION & QA VIEW ==================== -->
+    <section id="qa-view" class="view-panel">
+      <div class="qa-toolbar">
+        <div class="qa-search-row">
+          <i class="fa-solid fa-magnifying-glass" style="color: var(--primary);"></i>
+          <input type="text" id="qaSearchInput" class="qa-search-input" placeholder="Tìm câu hỏi (SDCard, USB, Clock, DDA, Homing, Vi > 65536...)" oninput="filterQA()">
+          <button class="slide-ctrl-btn" onclick="toggleAllQA()"><i class="fa-solid fa-arrows-retweet"></i> Đóng / Mở</button>
+        </div>
+
+        <div class="qa-filter-chips">
+          <span class="filter-chip active" onclick="filterQACategory('all', this)">Tất cả (26)</span>
+          <span class="filter-chip" onclick="filterQACategory('clock', this)">Clock & Timer (4)</span>
+          <span class="filter-chip" onclick="filterQACategory('firmware', this)">Firmware & DDA (4)</span>
+          <span class="filter-chip" onclick="filterQACategory('sdcard', this)">SDCard & USB (3)</span>
+          <span class="filter-chip" onclick="filterQACategory('cycle', this)">Chu Trình & Homing (3)</span>
+          <span class="filter-chip" onclick="filterQACategory('mech', this)">Cơ Khí (4)</span>
+          <span class="filter-chip" onclick="filterQACategory('elec', this)">Điện & Nguồn (4)</span>
+          <span class="filter-chip" onclick="filterQACategory('sim', this)">Mô Phỏng & Sai Số (4)</span>
+        </div>
+      </div>
+
+      <div id="qaContainer">
+        <!-- QA items injected by JS -->
+      </div>
+    </section>
+
+    <!-- ==================== 4. QUICK ENGINEERING CHEATSHEET VIEW ==================== -->
+    <section id="cheatsheet-view" class="view-panel">
+      <div class="cheatsheet-grid">
+        
+        <!-- Clock & Timer Parameters -->
+        <div class="slide-card">
+          <div class="slide-card-title"><i class="fa-solid fa-clock"></i> CẤU HÌNH CLOCK & TIMER TIM1</div>
+          <div class="table-responsive">
+            <table class="slide-table">
+              <tr><th>Thông số</th><th>Cấu hình</th><th>Giá trị tần số</th></tr>
+              <tr><td>Thạch anh ngoài HSE</td><td>PH0 / PH1</td><td>12.0 MHz</td></tr>
+              <tr><td>Main PLL (VCO 360MHz)</td><td>PLLM=6, PLLN=180, PLLP=2</td><td>SYSCLK = 180 MHz</td></tr>
+              <tr><td>Bus AHB (HCLK)</td><td>Divider /1</td><td>180 MHz</td></tr>
+              <tr><td>Bus APB1 / APB1 Timer</td><td>Divider /4, Timer x2</td><td>45 MHz / 90 MHz</td></tr>
+              <tr><td>Bus APB2 / APB2 Timer</td><td>Divider /2, Timer x2</td><td>90 MHz / 180 MHz</td></tr>
+              <tr><td>Clock SDIO & USB FS</td><td>PLLSAI (M=6, N=96, P=4)</td><td>CLK48 = 48.0 MHz</td></tr>
+              <tr><td>Timer DDA (TIM1 on APB2)</td><td>PSC=89, ARR=4 (CCR1=1, CCR2=2)</td><td>2 MHz Count, 400kHz Trigger (2.5µs)</td></tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- Geometric Parameters -->
+        <div class="slide-card">
+          <div class="slide-card-title"><i class="fa-solid fa-ruler-combined"></i> THÔNG SỐ HÌNH HỌC 6-PUS</div>
+          <div class="table-responsive">
+            <table class="slide-table">
+              <tr><th>Thông số</th><th>Ký hiệu</th><th>Giá trị thiết kế</th></tr>
+              <tr><td>Bán kính bệ động</td><td>$r_p$</td><td>68 mm</td></tr>
+              <tr><td>Bán kính bệ tĩnh</td><td>$r_b$</td><td>147 mm</td></tr>
+              <tr><td>Khoảng cách cặp khớp Base</td><td>$d_b$</td><td>56 mm</td></tr>
+              <tr><td>Khoảng cách cặp khớp Platform</td><td>$d_p$</td><td>38 mm</td></tr>
+              <tr><td>Chiều dài thanh giằng nối</td><td>$L$</td><td>230 mm</td></tr>
+              <tr><td>Góc phân tách chân Base</td><td>$\delta_b$</td><td>$41.70^\circ$</td></tr>
+              <tr><td>Góc phân tách chân Platform</td><td>$\delta_p$</td><td>$31.22^\circ$</td></tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- Ball Screw SFU1204 -->
+        <div class="slide-card">
+          <div class="slide-card-title"><i class="fa-solid fa-gear"></i> TRỤC VÍT ME BI SFU1204</div>
+          <div class="table-responsive">
+            <table class="slide-table">
+              <tr><th>Thông số</th><th>Ký hiệu</th><th>Giá trị</th></tr>
+              <tr><td>Đường kính danh nghĩa</td><td>$D$</td><td>12 mm</td></tr>
+              <tr><td>Bước ren trục vít</td><td>$P_h$</td><td>4 mm</td></tr>
+              <tr><td>Cấp chính xác chế tạo</td><td>Grade</td><td>C7 ($\pm 50\ \mu\text{m}/300\text{mm}$)</td></tr>
+              <tr><td>Hành trình làm việc</td><td>$L_{stroke}$</td><td>100 mm</td></tr>
+              <tr><td>Tải oằn tới hạn Euler</td><td>$P_1$</td><td>$12863\text{ N} \gg 66.2\text{ N}$</td></tr>
+              <tr><td>Vận tốc nguy hiểm</td><td>$N_1$</td><td>$24942\text{ RPM} \gg 1605\text{ RPM}$</td></tr>
+              <tr><td>Tuổi thọ tính toán</td><td>$L_h$</td><td>$3.55 \times 10^6\text{ giờ}$</td></tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- Motor & Driver -->
+        <div class="slide-card">
+          <div class="slide-card-title"><i class="fa-solid fa-microchip"></i> ĐỘNG CƠ & DRIVER STEP-SERVO</div>
+          <div class="table-responsive">
+            <table class="slide-table">
+              <tr><th>Thông số</th><th>Động cơ AM23RS4DMA</th><th>Driver SSDC06-IP-Z</th></tr>
+              <tr><td>Điện áp hoạt động</td><td>24 - 70 VDC</td><td>24 - 70 VDC</td></tr>
+              <tr><td>Momen xoắn giữ (Holding)</td><td>2.5 N.m</td><td>Dòng liên tục: 6.0 A</td></tr>
+              <tr><td>Momen tại 1605 RPM</td><td>$0.3\text{ N.m} > 0.114\text{ N.m}$</td><td>Dòng đỉnh: 7.5 A (1.5s)</td></tr>
+              <tr><td>Độ phân giải Encoder</td><td>4096 xung/vòng</td><td>Vòng kín Closed-Loop</td></tr>
+              <tr><td>Tín hiệu điều khiển</td><td>Step / Dir / Enable</td><td>Opto vi sai RS-422</td></tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- Microcontroller & Performance -->
+        <div class="slide-card">
+          <div class="slide-card-title"><i class="fa-solid fa-bolt"></i> STM32F446 & DDA PING-PONG</div>
+          <div class="table-responsive">
+            <table class="slide-table">
+              <tr><th>Thông số</th><th>Cấu hình</th><th>Ý nghĩa kỹ thuật</th></tr>
+              <tr><td>Lõi vi xử lý</td><td>ARM Cortex-M4 @ 180MHz</td><td>FPU phần cứng, 128KB SRAM</td></tr>
+              <tr><td>Tần số DDA phát xung</td><td>200 kHz ($5\ \mu\text{s/tick}$)</td><td>Độ phân giải thời gian siêu mịn</td></tr>
+              <tr><td>Cơ chế bộ đệm</td><td>Double-Buffering Ping-Pong</td><td>4 block 5ms / gói 20ms</td></tr>
+              <tr><td>Dung lượng RAM chiếm</td><td>48 KB</td><td>37.5% SRAM (không tràn nhớ)</td></tr>
+              <tr><td>Tải CPU khi phát xung</td><td>0% (DMA2 Streams + TIM1)</td><td>Triệt tiêu trễ & méo xung</td></tr>
+              <tr><td>Thời gian ngắt E-Stop</td><td>Phần cứng $<30\text{ms}$, SW $<1\mu\text{s}$</td><td>Bảo vệ an toàn kép</td></tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- Simulation Error Summary -->
+        <div class="slide-card">
+          <div class="slide-card-title"><i class="fa-solid fa-chart-line-up"></i> KẾT QUẢ MÔ PHỎNG & THỰC NGHIỆM</div>
+          <div class="table-responsive">
+            <table class="slide-table">
+              <tr><th>Chuyển động</th><th>Kịch bản 1 (Sóng ngang)</th><th>Kịch bản 2 (Pitch + Heave)</th></tr>
+              <tr><td>Heave ($Z$)</td><td>Max Error: $1.20\text{ mm}$ ($3.4\%$)</td><td>Max Error: $0.518\text{ mm}$</td></tr>
+              <tr><td>Sway ($Y$)</td><td>Max Error: $1.05\text{ mm}$ ($3.5\%$)</td><td>Max Error: $0.00084\text{ mm}$</td></tr>
+              <tr><td>Roll ($\phi$)</td><td>Max Error: $0.13^\circ$ ($3.15\%$)</td><td>Không kích hoạt ($0^\circ$)</td></tr>
+              <tr><td>Pitch ($\theta$)</td><td>Không kích hoạt ($0^\circ$)</td><td>Max Error: $0.1313^\circ$</td></tr>
+              <tr><td>Nguyên nhân sai số</td><td colspan="2">Lấy mẫu 0.02s rời rạc hóa bậc thang & lệch 8 xung MCU</td></tr>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== SLIDE GRID OVERVIEW MODAL ==================== -->
+  <div class="modal-overlay" id="slideGridModal" onclick="closeSlideGrid(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 style="font-family: var(--font-heading); color: #fff; font-size: 1.1rem;"><i class="fa-solid fa-grid-2"></i> TỔNG QUAN 30 SLIDES BÁO CÁO</h3>
+        <button class="btn-icon" onclick="closeSlideGrid()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body" id="slideThumbGrid">
+        <!-- Thumbnail items generated by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== JAVASCRIPT LOGIC ==================== -->
+  <script>
+    /* =========================================================
+       DATA: 30 SLIDES DEFINITION (WITH ESCAPED LATEX)
+       ========================================================= */
+    const slidesData = [
+      {
+        id: 1,
+        category: "MỞ ĐẦU",
+        title: "BÁO CÁO ĐỒ ÁN TỐT NGHIỆP",
+        subtitle: "Thiết kế hệ Stewart Platform 6-DOF nhằm mục đích mô phỏng lại chuyển động của xà lan trên biển",
+        body: `
+          <div style="text-align: center; margin: auto 0;">
+            <div style="font-size: 0.95rem; color: var(--primary); font-weight: 700; letter-spacing: 1px; margin-bottom: 12px;">TRƯỜNG ĐẠI HỌC BÁCH KHOA • KHOA CƠ KHÍ • BỘ MÔN CƠ ĐIỆN TỬ</div>
+            <h2 style="font-size: 1.65rem; color: #fff; font-family: var(--font-heading); margin-bottom: 18px; line-height: 1.3;">
+              THIẾT KẾ HỆ STEWART PLATFORM 6-DOF NHẰM MỤC ĐÍCH MÔ PHỎNG LẠI CHUYỂN ĐỘNG CỦA XÀ LAN TRÊN BIỂN
+            </h2>
+            <div class="slide-card" style="display: inline-block; text-align: left; padding: 16px 24px; margin: 0 auto;">
+              <p style="margin-bottom: 6px;"><strong>👨‍🎓 Sinh viên thực hiện:</strong> [Họ và Tên Sinh Viên] - MSSV: [xxxxxxx]</p>
+              <p style="margin-bottom: 6px;"><strong>👨‍🏫 Giảng viên hướng dẫn:</strong> [Họ và Tên Thầy/Cô Hướng Dẫn]</p>
+              <p><strong>🏛️ Hội đồng bảo vệ:</strong> Hội đồng Chấm Đồ Án Tốt Nghiệp Ngành Cơ Điện Tử</p>
+            </div>
+          </div>
+        `,
+        speakerNote: "Kính thưa Thầy/Cô Chủ tịch và quý Thầy/Cô trong Hội đồng chấm Đồ án tốt nghiệp. Hôm nay, em xin phép được đại diện trình bày đề tài: 'Thiết kế hệ Stewart platform 6-DOF nhằm mục đích mô phỏng lại chuyển động của xà lan trên biển'.",
+        script: `Kính thưa Thầy/Cô trong Hội đồng chấm bảo vệ Đồ án tốt nghiệp, cùng toàn thể các bạn sinh viên có mặt hôm nay.<br><br>
+        Em tên là <strong>[Họ và tên]</strong>, sinh viên ngành Cơ điện tử. Dưới sự hướng dẫn tận tình của <strong>[Thầy/Cô hướng dẫn]</strong>, hôm nay em rất vinh dự được đứng đây để báo cáo kết quả nghiên cứu và thực hiện đề tài: <span class="stress-phrase">"Thiết kế hệ Stewart platform 6-DOF nhằm mục đích mô phỏng lại chuyển động của xà lan trên biển"</span>.<br><br>
+        Bài báo cáo của em gồm 8 phần chính đi từ Tổng quan, Lựa chọn phương án, Tính toán cơ khí, Hệ thống điện tử, Cấu hình Clock/Timer/SDIO, Thuật toán DDA, Cơ chế bộ đệm kép Ping-Pong, đến Thực nghiệm mô phỏng và Đánh giá sai số. Em xin phép được bắt đầu.`
+      },
+      {
+        id: 2,
+        category: "CHƯƠNG I: TỔNG QUAN",
+        title: "Tính Cấp Thiết Của Đề Tài & Đặt Vấn Đề",
+        body: `
+          <div class="slide-grid-2">
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-water-ladder"></i> 1. Tác Động Sóng Biển Ngoài Khơi</div>
+              <ul class="bullet-list">
+                <li>Tàu/xà lan hoạt động chịu tác động liên tục của sóng biển, tạo ra chuyển động không gian <strong>6 bậc tự do (6-DOF)</strong>: <em>Surge, Sway, Heave, Roll, Pitch, Yaw</em>.</li>
+                <li>Gây biến thiên tải trọng lớn, làm lắc lư cần cẩu biển, sai lệch vị trí thả thiết bị ngầm và gây nguy cơ đứt cáp kéo.</li>
+              </ul>
+              <div class="alert-box" style="margin-top: 10px;">
+                <strong>⚠️ Vấn đề cốt lõi:</strong> Thử nghiệm thực địa ngoài biển cực kỳ tốn kém (hàng chục nghìn USD/ngày) và nguy hiểm.
+              </div>
+            </div>
+
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-ship"></i> 2. Nhu Cầu Nghiên Cứu Hệ Bù Chuyển Động</div>
+              <ul class="bullet-list">
+                <li>Để triệt tiêu ảnh hưởng sóng, các hệ thống <strong>bù chuyển động chủ động (Active Heave Compensation - AHC)</strong> bắt buộc phải được kiểm chứng thuật toán.</li>
+                <li>Áp dụng <strong>nguyên lý tương đồng thủy động lực Froude</strong>, việc chế tạo bệ mô phỏng chuyển động thu nhỏ trong phòng thí nghiệm là giải pháp tối ưu và an toàn nhất.</li>
+              </ul>
+              <div class="success-box" style="margin-top: 10px;">
+                <strong>🎯 Đóng góp:</strong> Cung cấp môi trường kiểm thử phần cứng trong vòng lặp (HIL) tin cậy cho công nghệ ngoài khơi.
+              </div>
+            </div>
+          </div>
+        `,
+        speakerNote: "Nhấn mạnh: Hoạt động hàng hải ngoài khơi đòi hỏi bù chuyển động sóng. Thử nghiệm ngoài biển quá đắt đỏ và nguy hiểm nên bệ thử khô trong phòng thí nghiệm là giải pháp tất yếu.",
+        script: `Kính thưa Thầy/Cô, trong các hoạt động ngoài khơi như thi công giàn khoan hay cẩu thả thiết bị ngầm, chuyển động 6 bậc tự do do sóng biển gây ra sự dao động lực căng cáp và sai lệch vị trí nghiêm trọng.<br><br>
+        Để nghiên cứu các giải pháp <span class="stress-phrase">Bù chuyển động sóng chủ động (Active Heave Compensation)</span>, các nhà khoa học bắt buộc phải thử nghiệm thuật toán trước khi triển khai thực địa. Tuy nhiên, việc ra khơi thử nghiệm là vô cùng tốn kém và rủi ro.<br><br>
+        Vì vậy, việc xây dựng một hệ thống mô phỏng chuyển động sóng biển ngay trong phòng Lab theo nguyên lý tương đồng thủy động lực học của William Froude là hết sức cấp thiết.`
+      },
+      {
+        id: 3,
+        category: "CHƯƠNG I: TỔNG QUAN",
+        title: "Các Phương Pháp Mô Phỏng Chuyển Động Biển",
+        body: `
+          <div class="slide-grid-2">
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-waves"></i> 1. Bể Thử Sóng Vật Lý (Wave Basin)</div>
+              <ul class="bullet-list">
+                <li><strong>Ví dụ tiêu biểu:</strong> Bể thử SINTEF Ocean (Na Uy) kích thước $80\\text{m} \\times 50\\text{m} \\times 10\\text{m}$, tỷ lệ 1:50.</li>
+                <li><strong>Cơ cấu tạo sóng:</strong> Flap, Piston, Double flap.</li>
+                <li><strong>Nhược điểm chí tử:</strong>
+                  <ul>
+                    <li>Chi phí đầu tư và vận hành khổng lồ.</li>
+                    <li><strong>Hiện tượng phản xạ sóng:</strong> Sau $t=87\\text{s}$, sóng phản xạ từ vách bể gây sóng đứng và sai lệch dữ liệu quá độ.</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-robot"></i> 2. Hệ Mô Phỏng Chuyển Động Khô (Dry Rig)</div>
+              <ul class="bullet-list">
+                <li><strong>Nguyên lý:</strong> Dùng cơ cấu robot đa trục trong phòng lab để tái tạo chuyển động theo dữ liệu đo thực hoặc mô phỏng số.</li>
+                <li><strong>Ưu điểm vượt trội:</strong>
+                  <ul>
+                    <li>Chi phí vận hành siêu thấp, kích thước nhỏ gọn.</li>
+                    <li>Chạy liên tục không giới hạn thời gian (không bị phản xạ sóng).</li>
+                    <li>Dễ dàng gắn cảm biến, camera giám sát độ chính xác cao.</li>
+                  </ul>
+                </li>
+              </ul>
+              <div class="highlight-box">
+                <strong>👉 Kết luận:</strong> Đề tài lựa chọn hướng tiếp cận <strong>Bệ Thử Chuyển Động Khô</strong>.
+              </div>
+            </div>
+          </div>
+        `,
+        speakerNote: "Chỉ rõ nhược điểm lớn của Bể sóng SINTEF Ocean: sóng phản xạ tại t=87s gây nhiễu chuyển động Sway. Bệ thử khô khắc phục hoàn toàn vấn đề này.",
+        script: `Khi xem xét các phương pháp thực nghiệm, Bể thử sóng nước truyền thống như của SINTEF Ocean (kích thước 80x50m) dù rất trực quan nhưng có nhược điểm lớn: <span class="stress-phrase">chi phí vận hành cực cao</span> và đặc biệt là hiện tượng phản xạ sóng từ thành bể sau 87 giây làm méo mó tín hiệu quá độ.<br><br>
+        Ngược lại, <span class="stress-phrase">Hệ mô phỏng chuyển động khô (Dry Motion Platform)</span> dùng robot đa trục trong phòng thí nghiệm giải quyết trọn vẹn các nhược điểm này: chi phí thấp, chạy liên tục không bị nhiễu phản xạ và dễ dàng lắp đặt hệ thống đo lường chính xác.`
+      },
+      {
+        id: 4,
+        category: "CHƯƠNG I: TỔNG QUAN",
+        title: "Tổng Quan Về Cơ Cấu Song Song Stewart Platform",
+        body: `
+          <div class="slide-grid-2">
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-diagram-project"></i> 1. Đặc Điểm Robot Song Song 6-DOF</div>
+              <ul class="bullet-list">
+                <li>Được D. Stewart đề xuất năm 1965, gồm bệ tĩnh (Base) và bệ động (Platform) kết nối qua <strong>6 cơ cấu chấp hành độc lập</strong>.</li>
+                <li><strong>So với robot nối tiếp (Serial Robot):</strong>
+                  <ul>
+                    <li>Độ cứng vững cơ học (Stiffness) cực cao.</li>
+                    <li>Khả năng chịu tải trọng lớn do tải phân bố đều trên 6 chân.</li>
+                    <li>Không bị tích lũy sai số vị trí qua các khớp.</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-industry"></i> 2. Ứng Dụng Thực Tiễn & Phân Loại</div>
+              <ul class="bullet-list">
+                <li><strong>Ứng dụng:</strong> Buồng mô phỏng tập lái máy bay/tàu thủy, máy gia công CNC 6 trục, kính thiên văn, phẫu thuật robot.</li>
+                <li><strong>Hai dạng cơ cấu chính:</strong>
+                  <ul>
+                    <li><strong>Dạng Xoay (Rotary - RSS):</strong> Dùng tay đòn quay truyền lực qua thanh giằng.</li>
+                    <li><strong>Dạng Tịnh Tiến (Linear - PUS/UPS):</strong> Dùng xi lanh điện hoặc trục vít me tịnh tiến.</li>
+                  </ul>
+                </li>
+              </ul>
+              <div class="highlight-box">
+                Cần so sánh định lượng momen và động học để chọn phương án tối ưu.
+              </div>
+            </div>
+          </div>
+        `,
+        speakerNote: "Nêu bật ưu điểm của Stewart: Tải phân bố song song trên 6 chân, không tích lũy sai số, độ cứng vượt trội so với robot cánh tay nối tiếp.",
+        script: `Về mặt cơ cấu cơ học, Stewart Platform là cơ cấu robot song song 6 bậc tự do kinh điển. Khác với robot chuỗi hở thông thường bị tích lũy sai số và độ võng cơ học lớn, Stewart Platform phân bố đều tải trọng lên 6 cơ cấu chấp hành song song, mang lại độ cứng vững, khả năng chịu tải và độ chính xác lặp lại vượt trội.<br><br>
+        Hiện nay có 2 cấu hình chính là dạng cơ cấu xoay tay đòn và dạng cơ cấu tịnh tiến. Để xác định phương án phù hợp nhất cho mô phỏng xà lan, chúng ta cùng khảo sát các hệ thống hiện có trên thế giới.`
+      },
+      {
+        id: 5,
+        category: "CHƯƠNG I: TỔNG QUAN",
+        title: "Khảo Sát Hệ Có Sẵn & Mục Tiêu Thiết Kế Của Đề Tài",
+        body: `
+          <div class="slide-grid-2">
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-magnifying-glass-chart"></i> 1. Khảo Sát Hệ Có Sẵn</div>
+              <div class="table-responsive">
+                <table class="slide-table">
+                  <tr><th>Hệ thống</th><th>Cấu hình</th><th>Ưu / Nhược điểm</th></tr>
+                  <tr>
+                    <td><strong>ACROME (Linear)</strong></td>
+                    <td>Động cơ DC tuyến tính + Biến trở + IMU</td>
+                    <td>Gọn, dễ học tập, nhưng tải nhỏ (12kg), tốc độ thấp ($40\\text{ mm/s}$).</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Knaufinator (Rotary)</strong></td>
+                    <td>AC Servo 750W + Hộp số 50:1 + ESP32</td>
+                    <td>Tải rất lớn (200kg) nhưng cồng kềnh, chi phí đắt đỏ, điều khiển hở.</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-bullseye"></i> 2. Chỉ Tiêu Kỹ Thuật Đề Tài Đặt Ra</div>
+              <div class="metric-grid">
+                <div class="metric-pill">
+                  <div class="metric-value">$\\ge 30\\text{ kg}$</div>
+                  <div class="metric-label">Tải Trọng Tối Đa</div>
+                </div>
+                <div class="metric-pill">
+                  <div class="metric-value">$\\pm 0.5\\text{ mm}$</div>
+                  <div class="metric-label">Độ Lặp Lại</div>
+                </div>
+                <div class="metric-pill">
+                  <div class="metric-value">$\\pm 100\\text{ mm}$</div>
+                  <div class="metric-label">Heave (Z)</div>
+                </div>
+                <div class="metric-pill">
+                  <div class="metric-value">$\\pm 70\\text{ mm}$</div>
+                  <div class="metric-label">Hành Trình X, Y</div>
+                </div>
+                <div class="metric-pill">
+                  <div class="metric-value">$\\pm 15^\\circ$</div>
+                  <div class="metric-label">Góc Xoay R,P,Y</div>
+                </div>
+                <div class="metric-pill">
+                  <div class="metric-value">$600\\times 600$</div>
+                  <div class="metric-label">Kích Thước (mm)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `,
+        speakerNote: "Chỉ ra điểm cân bằng của đề tài: Tải trọng 30kg (gấp 2.5 lần Acrome), độ chính xác cao ±0.5mm, không cồng kềnh và đắt đỏ như Knaufinator.",
+        script: `Khảo sát trên thị trường cho thấy: Hệ Stewart của ACROME dùng xi lanh tuyến tính DC rất gọn nhưng tải chỉ 12kg và tốc độ chậm. Hệ Knaufinator dùng AC Servo 750W tải 200kg thì lại quá cồng kềnh và đắt tiền.<br><br>
+        Từ đó, đề tài đặt ra mục tiêu thiết kế một hệ thống tối ưu cho phòng thí nghiệm: <span class="stress-phrase">Tải trọng làm việc 30 kg, độ chính xác lặp lại đạt ±0.5 mm, hành trình nâng hạ Heave ±100 mm, góc nghiêng Roll/Pitch ±15°</span>, và kích thước tổng thể nhỏ gọn trong phạm vi 600x600 mm.`
+      },
+      {
+        id: 6,
+        category: "CHƯƠNG II: LỰA CHỌN PHƯƠNG ÁN",
+        title: "Phương Án 1: Cơ Cấu Dạng Xoay (Rotary Stewart Platform)",
+        body: `
+          <div class="slide-grid-2">
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-arrows-rotate"></i> 1. Nguyên Lý Cơ Khí & Điện</div>
+              <ul class="bullet-list">
+                <li>Động cơ servo/bước quay truyền momen qua 6 cánh tay đòn (Crank arm), nối với bệ động qua thanh truyền trung gian và khớp cầu.</li>
+                <li><strong>Sơ đồ điện:</strong> Nguồn 220VAC cấp cho 6 Driver Servo, Controller điều khiển tập trung, cảm biến Limit switch tại vị trí home.</li>
+              </ul>
+              <div class="alert-box" style="margin-top: 8px;">
+                <strong>⚠️ Nhược điểm cánh tay đòn:</strong> Cánh tay đòn tạo ra cánh tay đòn lực lớn khi nghiêng bệ, làm sinh momen uốn cực lớn tại trục động cơ.
+              </div>
+            </div>
+
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-sliders"></i> 2. Quy Trình Điều Khiển & Vận Hành</div>
+              <ul class="bullet-list">
+                <li>Máy tính tính trước quỹ đạo $\\rightarrow$ Gửi chuỗi vị trí góc xuống Controller.</li>
+                <li>Thực hiện Homing về góc 0 $\\rightarrow$ Phát lệnh phát xung/PWM đến Driver.</li>
+                <li>Driver chạy vòng kín với Encoder phản hồi góc của động cơ.</li>
+              </ul>
+              <div class="highlight-box">
+                Yêu cầu động cơ công suất lớn và hộp giảm tốc độ rơ thấp (Harmonic/Planetary) $\\rightarrow$ Chi phí rất cao.
+              </div>
+            </div>
+          </div>
+        `,
+        speakerNote: "Giải thích nhược điểm hệ xoay: Cánh tay đòn sinh ra momen xoắn cực đại lên trục động cơ khi tải bệ lệch tâm, bắt buộc phải dùng động cơ và hộp số rất lớn.",
+        script: `Ở Chương 2, nhóm tiến hành phân tích hai phương án thiết kế. Phương án 1 là cơ cấu dạng xoay dùng cánh tay đòn.<br><br>
+        Tuy cấu trúc này linh hoạt và tốc độ góc cao, nhưng nhược điểm lớn nhất nằm ở cánh tay đòn lực. Khi bệ động mang tải 30kg và nghiêng góc lớn, lực tác dụng vuông góc lên cánh tay đòn sẽ nhân lên tạo ra <span class="stress-phrase">momen xoắn cực lớn tác động trực tiếp vào trục động cơ</span>, đòi hỏi phải dùng động cơ Servo công suất lớn kèm hộp số giảm tốc đắt tiền.`
+      },
+      {
+        id: 7,
+        category: "CHƯƠNG II: LỰA CHỌN PHƯƠNG ÁN",
+        title: "Phương Án 2: Cơ Cấu Dạng Tịnh Tiến Đứng 6-PUS (Linear)",
+        body: `
+          <div class="slide-grid-2">
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-arrows-up-down"></i> 1. Nguyên Lý Cơ Cấu 6-PUS</div>
+              <ul class="bullet-list">
+                <li>Sử dụng <strong>6 cụm trục vít me đai ốc bi thẳng đứng</strong> (tương tự trục Z của máy CNC chính xác).</li>
+                <li>Đai ốc bi nâng hạ con trượt, truyền lực qua <strong>khớp Cardan</strong> và thanh giằng $L=230\\text{ mm}$ lên khớp cầu bệ động.</li>
+                <li>Tạo thành chuỗi động học <strong>6-PUS (Prismatic - Universal - Spherical)</strong>.</li>
+              </ul>
+              <div class="success-box" style="margin-top: 8px;">
+                <strong>✅ Lợi thế cơ học:</strong> Bộ truyền vít me biến chuyển động quay thành tịnh tiến với hiệu suất $\\approx 90\\%$ và khả năng nhân lực cực lớn!
+              </div>
+            </div>
+
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-microchip"></i> 2. Hệ Thống Điện & Điều Khiển Đề Xuất</div>
+              <ul class="bullet-list">
+                <li>Nguồn 24VDC công nghiệp cấp cho 6 Driver Step-Servo Closed-loop.</li>
+                <li>Vi điều khiển STM32F446 trung tâm phát xung đồng bộ thời gian thực.</li>
+                <li>Cảm biến tiệm cận quang điện từ xác định gốc tọa độ chính xác.</li>
+              </ul>
+              <div class="highlight-box">
+                Động cơ bước Hybrid vòng kín vừa có momen giữ lớn ở tốc độ thấp, vừa chống mất bước nhờ encoder.
+              </div>
+            </div>
+          </div>
+        `,
+        speakerNote: "Nhấn mạnh cơ cấu 6-PUS: Sử dụng trục vít me đứng biến chuyển động quay thành tịnh tiến, giải phóng momen uốn và triệt tiêu tải trọng lên trục motor.",
+        script: `Phương án 2 là cơ cấu tịnh tiến đứng 6-PUS sử dụng 6 trục vít me bi dẫn hướng song song. Đai ốc di chuyển dọc trục sẽ truyền lực qua khớp Cardan và thanh nối lên bệ động.<br><br>
+        Ưu điểm tuyệt đối của phương án này là <span class="stress-phrase">hiệu suất biến đổi lực của vít me bi rất cao</span>, lực nâng gần như thuần túy là lực dọc trục, giúp giảm tải momen cho động cơ đến hàng chục lần so với cơ cấu xoay.`
+      },
+      {
+        id: 8,
+        category: "CHƯƠNG II: LỰA CHỌN PHƯƠNG ÁN",
+        title: "Ma Trận Quyết Định & Lựa Chọn Phương Án 6-PUS",
+        body: `
+          <div class="slide-grid-2">
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-calculator"></i> 1. Tính Toán So Sánh Momen Tải Trên Matlab</div>
+              <p>Khảo sát trường hợp góc nghiêng $\\text{Roll} = 15^\\circ$ với cùng thông số hình học:</p>
+              <div class="table-responsive">
+                <table class="slide-table" style="margin-top: 8px;">
+                  <tr><th>Phương án</th><th>Momen tải max</th><th>Nhận xét</th></tr>
+                  <tr><td><strong>Phương án Xoay</strong></td><td style="color: var(--danger); font-weight: bold;">$95.457\\text{ N.mm}$</td><td>Cần động cơ rất lớn</td></tr>
+                  <tr><td><strong>Phương án Tịnh tiến (Vít me)</strong></td><td style="color: var(--success); font-weight: bold;">$3.760\\text{ N.mm}$</td><td><strong>Nhỏ hơn 25.4 lần!</strong></td></tr>
+                </table>
+              </div>
+              <div class="highlight-box" style="margin-top: 8px;">
+                Phương án vít me giúp tối ưu hóa kích thước động cơ và giảm tối đa điện năng tiêu thụ.
+              </div>
+            </div>
+
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-check-double"></i> 2. Ma Trận Đánh Giá Đa Tiêu Chí Có Trọng Số</div>
+              <div class="table-responsive">
+                <table class="slide-table">
+                  <tr><th>Nhóm tiêu chí</th><th>Hệ xoay</th><th>Hệ tịnh tiến 6-PUS</th></tr>
+                  <tr><td>Độ phức tạp cơ khí (x2)</td><td>$3 \\times 2 = 6$</td><td>$1 \\times 2 = 2$</td></tr>
+                  <tr><td>Chịu tải & gia tốc (x3)</td><td>$1 \\times 3 = 3$</td><td><strong>$3 \\times 3 = 9$</strong></td></tr>
+                  <tr><td>Độ chính xác lặp lại (x3)</td><td>$1 \\times 3 = 3$</td><td><strong>$3 \\times 3 = 9$</strong></td></tr>
+                  <tr><td>Chi phí & Độ ổn định điện (x3)</td><td>$4$</td><td><strong>$6$</strong></td></tr>
+                  <tr><td>Đồng bộ & Thuật toán (x8)</td><td>$24$</td><td>$24$</td></tr>
+                  <tr style="font-weight: bold; background: rgba(56, 189, 248, 0.2);">
+                    <td>TỔNG ĐIỂM (Thang 72)</td>
+                    <td style="color: var(--danger);">52 / 72</td>
+                    <td style="color: var(--success);">67 / 72 (CHỌN)</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        `,
+        speakerNote: "Nhấn mạnh số liệu: Momen tải hệ xoay 95.46 N.mm gấp 25 lần so với vít me 3.76 N.mm. Ma trận quyết định đạt 67/72 điểm chọn hệ tịnh tiến 6-PUS.",
+        script: `Để chứng minh một cách khoa học, nhóm đã lập mô hình tính toán trên Matlab với cùng tải trọng và kích thước hình học ở góc Roll 15 độ.<br><br>
+        Kết quả cho thấy: <span class="stress-phrase">Momen tải của phương án xoay là 95.46 N.mm, gấp hơn 25 lần so với phương án vít me (chỉ 3.76 N.mm)</span>.<br><br>
+        Kết hợp với bảng đánh giá đa tiêu chí có trọng số, hệ tịnh tiến 6-PUS đạt <strong>67/72 điểm</strong>, vượt trội so với 52 điểm của hệ xoay ở các tiêu chí then chốt: khả năng chịu tải, độ cứng vững và độ chính xác lặp lại. Vì vậy, nhóm quyết định chọn phương án 6-PUS để thiết kế chi tiết.`
+      },
+      {
+        id: 9,
+        category: "CHƯƠNG III: THIẾT KẾ CƠ KHÍ",
+        title: "Xác Định Thông Số Kích Thước Hình Học Cơ Cấu",
+        body: `
+          <div class="slide-grid-2">
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-compass-drafting"></i> 1. Tính Toán Bán Kính & Góc Phân Tách</div>
+              <ul class="bullet-list">
+                <li>Bán kính platform nhỏ nhất tránh chạm khớp ($r_j=50\\text{mm}, j_m=12\\text{mm}$):
+                  $$r_{min} = \\frac{2r_j + j_m}{2\\sin(120^\\circ)} = 64.66\\text{ mm} \\implies \\text{Chọn } \\mathbf{r_p = 68\\text{ mm}}$$
+                </li>
+                <li>Tỷ lệ kích thước chuẩn: $r_p = (0.4 \\dots 0.7) r_b \\implies \\text{Chọn } \\mathbf{r_b = 147\\text{ mm}}$.</li>
+                <li>Góc phân tách chân Base: $\\mathbf{\\delta_b = 41.7^\\circ}$; Chân Platform: $\\mathbf{\\delta_p = 31.22^\\circ}$.</li>
+                <li>Khoảng cách cặp điểm: $d_b = 56\\text{ mm}, d_p = 38\\text{ mm}$. Chiều dài thanh nối: $\\mathbf{L = 230\\text{ mm}}$.</li>
+              </ul>
+            </div>
+
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-chart-line"></i> 2. Động Học Chuyển Động Sóng Mong Muốn</div>
+              <p>Quy đổi chuyển động hình sin sang hình thang ($T=1.5\\text{s}, \\text{Sample } 0.02\\text{s}$):</p>
+              <ul class="bullet-list" style="margin-top: 6px;">
+                <li>Độ dịch chuyển max giữa 2 lần lấy mẫu: $\\Delta s_{max} = 2.137\\text{ mm}$.</li>
+                <li>Vận tốc dọc trục tối đa: $\\mathbf{V_{max} = 10.68\\text{ cm/s}}$ ($0.107\\text{ m/s}$).</li>
+                <li>Gia tốc dọc trục tối đa: $\\mathbf{a_{max} = 44.76\\text{ cm/s}^2}$ ($0.4476\\text{ m/s}^2$).</li>
+              </ul>
+              <div class="success-box" style="margin-top: 8px;">
+                Đây là đầu vào bắt buộc để tính toán bộ truyền vít me và chọn động cơ.
+              </div>
+            </div>
+          </div>
+        `,
+        speakerNote: "Giải thích các thông số hình học rp=68mm, rb=147mm, L=230mm. Tính được Vmax=10.7cm/s và amax=0.4476 m/s2 làm cơ sở tính chọn thiết bị.",
+        script: `Bước vào Chương 3 - Thiết kế cơ khí, nhóm tiến hành giải bài toán hình học cơ cấu. Để đảm bảo các khớp cầu không va quẹt vào nhau khi chuyển động, bán kính bệ động tối thiểu được tính toán là 64.66 mm, nhóm chọn rp = 68 mm và bán kính bệ tĩnh rb = 147 mm.<br><br>
+        Với chiều dài thanh giằng L = 230 mm, khi mô phỏng chuyển động sóng xà lan chu kỳ 1.5s, vận tốc dài cực đại của đai ốc là <span class="stress-phrase">10.7 cm/s</span> và gia tốc cực đại là <span class="stress-phrase">0.4476 m/s²</span>. Đây là các thông số then chốt để tính chọn bộ truyền vít me.`
+      },
+      {
+        id: 10,
+        category: "CHƯƠNG III: THIẾT KẾ CƠ KHÍ",
+        title: "Tính Chọn & Thiết Kế Bộ Truyền Trục Vít Me Bi",
+        body: `
+          <div class="slide-grid-2">
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-screwdriver"></i> 1. Tính Chọn Thông Số SFU1204</div>
+              <ul class="bullet-list">
+                <li>Yêu cầu độ chính xác $0.05\\text{mm}/100\\text{mm} \\rightarrow$ Chọn cấp chính xác <strong>C7</strong> ($\\pm 50\\ \\mu\\text{m}/300\\text{mm}$).</li>
+                <li>Với tốc độ động cơ $\\le 3000\\text{ RPM}$, bước ren tối thiểu $p \\ge 2.14\\text{ mm} \\implies \\text{Chọn } \\mathbf{P_h = 4\\text{ mm}}, \\mathbf{D = 12\\text{ mm}}$.</li>
+                <li>Chiều dài trục vít: $L = L_{stroke} + L_{end} + L_{plate} = 100 + 36 + 100 = \\mathbf{236\\text{ mm}}$ (Chọn loại thương mại $300\\text{mm}$).</li>
+                <li>Tốc độ quay làm việc tối đa: $N_{max} = \\frac{V_{max} \\times 60 \\times 1000}{P_h} = \\mathbf{1605\\text{ RPM}}$.</li>
+              </ul>
+            </div>
+
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-shield-halved"></i> 2. Kiểm Tra An Toàn Động Lực Học</div>
+              <ul class="bullet-list">
+                <li>Lực dọc trục max: $F_{max} = m(g+a) + f_{seal} = 5(9.8 + 0.4476) + 15 = \\mathbf{66.24\\text{ N}}$.</li>
+                <li>Tải oằn tới hạn Euler (Fixed-Supported): $\\mathbf{P_1 = 12863\\text{ N}} \\gg 66.24\\text{ N}$ (An toàn gấp 194 lần).</li>
+                <li>Vận tốc nguy hiểm: $\\mathbf{N_1 = 24942\\text{ RPM}} \\gg 1605\\text{ RPM}$.</li>
+                <li>Giới hạn DN: $N_2 = \\frac{70000}{12} = 5833\\text{ RPM} > 1605\\text{ RPM}$.</li>
+                <li>Tuổi thọ làm việc: $\\mathbf{L_h = 3.55 \\times 10^6\\text{ giờ}}$ ($\\approx 1.368 \\times 10^6\\text{ km}$).</li>
+              </ul>
+              <div class="success-box" style="margin-top: 6px;">
+                Trục vít me SFU1204 hoàn toàn dư bền và đạt độ tin cậy vận hành rất cao.
+              </div>
+            </div>
+          </div>
+        `,
+        speakerNote: "Chứng minh: Vít me SFU1204 cấp C7, bước 4mm. Tải oằn 12863 N gấp 194 lần tải cực đại 66.24 N. Tốc độ nguy hiểm 24942 RPM vượt xa 1605 RPM.",
+        script: `Dựa trên yêu cầu độ chính xác định vị 0.05 mm, nhóm đã tính toán và lựa chọn bộ truyền vít me bi <strong>SFU1204 cấp C7</strong> (đường kính 12 mm, bước ren 4 mm).<br><br>
+        Quá trình kiểm tra động lực học cho thấy: Lực dọc trục lớn nhất mà 1 chân phải chịu khi tăng tốc đi lên là <span class="stress-phrase">66.24 N</span>. Trong khi đó, tải gây oằn trục Euler tính được lên tới <span class="stress-phrase">12863 N</span>, nghĩa là hệ số an toàn chống oằn lên đến 194 lần. Tốc độ nguy hiểm của trục là 24942 RPM, hoàn toàn vượt xa tốc độ vận hành 1605 RPM.`
+      },
+      {
+        id: 11,
+        category: "CHƯƠNG III: THIẾT KẾ CƠ KHÍ",
+        title: "Tính Chọn Động Cơ Bước Hybrid & Gối Đỡ, Khớp Nối",
+        body: `
+          <div class="slide-grid-2">
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-motorcycle"></i> 1. Tính Chọn Động Cơ Vòng Kín</div>
+              <ul class="bullet-list">
+                <li>Momen xoắn cần thiết khi tăng tốc: $T_{k1} = T_{load} + T_{accel} = 45.29 + 30.47 = \\mathbf{75.76\\text{ N.mm}}$.</li>
+                <li>Momen hiệu dụng: $T_{RMS} = 43.64\\text{ N.mm}$.</li>
+                <li>Với hệ số an toàn $K=1.5$: $T_M = \\mathbf{0.114\\text{ N.m}}$, $T_{MRMS} = \\mathbf{0.065\\text{ N.m}}$.</li>
+                <li><strong>Chọn Động cơ:</strong> <span style="color: var(--primary); font-weight: bold;">MOONS Hybrid Step AM23RS4DMA</span>
+                  <ul>
+                    <li>Momen giữ: <strong>2.5 N.m</strong>; Encoder: <strong>4096 xung/vòng</strong>.</li>
+                    <li>Tại $1605\\text{ RPM}$ ($26.75\\text{ rps}$), Momen phát ra đạt <strong>0.3 N.m > 0.114 N.m</strong> (Thỏa mãn tuyệt đối).</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-ring"></i> 2. Chọn Gối Đỡ Trục & Nối Trục Đàn Hồi</div>
+              <ul class="bullet-list">
+                <li><strong>Kiểu lắp gối đỡ:</strong> Fixed - Supported.
+                  <ul>
+                    <li>Đầu Fixed: Chọn gối đỡ <strong>FK10</strong> (Tải động $6600\\text{ N} \\gg 66.2\\text{ N}$).</li>
+                    <li>Đầu Supported: Chọn gối đỡ <strong>FF8</strong> (Tải tĩnh $2730\\text{ N}$).</li>
+                  </ul>
+                </li>
+                <li><strong>Nối trục đàn hồi:</strong> Mẫu <strong>E-LMPJC</strong>
+                  <ul>
+                    <li>Momen xoắn định mức $2.5\\text{ N.m}$, khóa tối đa $3.5\\text{ N.m}$.</li>
+                    <li>Ứng suất dập sinh ra trên đĩa: $\\sigma_d = 0.04\\text{ MPa} \\ll [\\sigma_d] = 2.0\\text{ MPa}$.</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+        `,
+        speakerNote: "Nhấn mạnh: Momen cần thiết 0.114 N.m tại 1605 RPM, động cơ MOONS đáp ứng 0.3 N.m, có sẵn encoder 4096 xung/vòng giám sát chống mất bước.",
+        script: `Để chọn động cơ, nhóm tính toán momen tăng tốc cực đại là 75.76 N.mm và momen hiệu dụng TRMS = 43.64 N.mm. Nhân hệ số an toàn 1.5, momen đỉnh yêu cầu là 0.114 N.m.<br><br>
+        Nhóm lựa chọn động cơ bước lai vòng kín <strong>MOONS AM23RS4DMA</strong> có momen giữ 2.5 N.m và tích hợp encoder 4096 xung/vòng. Tại tốc độ làm việc 1605 RPM, động cơ vẫn duy trì momen 0.3 N.m, lớn gấp gần 3 lần yêu cầu.<br><br>
+        Gối đỡ trục FK10/FF8 và khớp nối đĩa đàn hồi E-LMPJC cũng được kiểm nghiệm độ bền dập và chịu tải hoàn toàn thỏa mãn tiêu chuẩn.`
+      },
+      {
+        id: 12,
+        category: "CHƯƠNG III: THIẾT KẾ CƠ KHÍ",
+        title: "Phân Tích Dung Sai Lắp Ghép & Khử Rơ Cơ Khí",
+        body: `
+          <div class="slide-card">
+            <div class="slide-card-title"><i class="fa-solid fa-ruler"></i> Bảng Tiêu Chuẩn Dung Sai Lắp Ghép Hệ 6-PUS</div>
+            <div class="table-responsive">
+              <table class="slide-table">
+                <tr><th>Vị trí lắp ghép</th><th>Chi tiết 1</th><th>Chi tiết 2</th><th>Kiểu lắp</th><th>Mục đích kỹ thuật</th></tr>
+                <tr>
+                  <td><strong>Gá Động Cơ</strong></td>
+                  <td>Mặt bích Động cơ (NEMA 23)</td>
+                  <td>Tấm gá động cơ</td>
+                  <td><span style="color: var(--primary); font-weight: bold;">$\\varnothing 38.1\\text{ H7}$</span></td>
+                  <td>Đồng tâm cao giữa trục động cơ và vít me, sai số $\\le \\pm 0.05\\text{mm}$.</td>
+                </tr>
+                <tr>
+                  <td><strong>Gối Đỡ & Ray Dẫn</strong></td>
+                  <td>Tấm gá gối đỡ cố định</td>
+                  <td>Trục dẫn hướng tròn</td>
+                  <td><span style="color: var(--primary); font-weight: bold;">$\\varnothing 10\\text{ H7/k6}$</span></td>
+                  <td>Lắp chặt trung gian, đảm bảo 2 trục dẫn hướng song song tuyệt đối với vít me.</td>
+                </tr>
+                <tr>
+                  <td><strong>Bạc Trượt Con Trượt</strong></td>
+                  <td>Bạc trượt bi dẫn hướng</td>
+                  <td>Tấm gá đai ốc vít me</td>
+                  <td><span style="color: var(--primary); font-weight: bold;">$\\varnothing 19\\text{ H7/h6}$</span></td>
+                  <td>Lắp trượt nhẹ, triệt tiêu khe hở rơ lắc nhưng tránh quá định vị gây kẹt đai ốc.</td>
+                </tr>
+                <tr>
+                  <td><strong>Dẫn Hướng Trục Tự Do</strong></td>
+                  <td>Bạc trượt trục truyền động</td>
+                  <td>Tấm gắn gối tự do</td>
+                  <td><span style="color: var(--primary); font-weight: bold;">$\\varnothing 21\\text{ H7/k6}$</span></td>
+                  <td>Định hướng trục truyền động chuyển động tịnh tiến thẳng đứng chính xác.</td>
+                </tr>
+                <tr>
+                  <td><strong>Khớp Cardan</strong></td>
+                  <td>Trục dẫn động</td>
+                  <td>Lỗ ngỗng khớp Cardan</td>
+                  <td><span style="color: var(--primary); font-weight: bold;">$\\varnothing 12\\text{ H7/h6}$</span></td>
+                  <td>Khử hoàn toàn độ rơ khe hở góc, triệt tiêu rung giật truyền lên bệ động.</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        `,
+        speakerNote: "Trình bày giải pháp công nghệ: Dùng dung sai H7/k6 cho liên kết chặt và H7/h6 cho khớp trượt/khớp Cardan để triệt tiêu hiện tượng siêu định vị và khử rơ.",
+        script: `Một thách thức lớn trong cơ cấu cơ khí chính xác là hiện tượng kẹt cứng do quá định vị và sai số rơ lắc. Nhóm đã tính toán chi tiết chuỗi kích thước và chọn dung sai lắp ghép tiêu chuẩn:<br><br>
+        Lỗ gá mặt bích động cơ dùng <span class="stress-phrase">∅38.1 H7</span> để định tâm chính xác trong phạm vi 0.05 mm. Trục dẫn hướng lắp chặt <span class="stress-phrase">∅10 H7/k6</span> để đảm bảo độ song song tuyệt đối với trục vít me. Bạc trượt và khớp Cardan dùng kiểu lắp <span class="stress-phrase">H7/h6</span> để triệt tiêu khe hở rơ lắc mà không gây kẹt đai ốc khi vận hành ở tốc độ cao.`
+      },
+      {
+        id: 13,
+        category: "CHƯƠNG III: THIẾT KẾ CƠ KHÍ",
+        title: "Kiểm Nghiệm Bền FEA Các Chi Tiết Truyền Động",
+        body: `
+          <div class="slide-grid-3">
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-cube"></i> 1. Tấm Gá Đai Ốc</div>
+              <ul class="bullet-list" style="font-size: 0.88rem;">
+                <li><strong>Vật liệu:</strong> Nhôm hợp kim ($\\sigma_y = 275\\text{ MPa}$).</li>
+                <li><strong>Ứng suất Von-Mises:</strong> $\\sigma_{max} = 5.481\\text{ MPa}$.</li>
+                <li><strong>Chuyển vị lớn nhất:</strong> $\\delta = 0.004\\text{ mm}$.</li>
+                <li><strong>Hệ số an toàn:</strong> <span style="color: var(--success); font-weight: bold;">$\\text{SF} = 50.0$</span>.</li>
+              </ul>
+            </div>
+
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-arrows-up-to-line"></i> 2. Trục Vít Me Bi</div>
+              <ul class="bullet-list" style="font-size: 0.88rem;">
+                <li><strong>Vật liệu:</strong> Thép hợp kim ($\\sigma_y = 207\\text{ MPa}$).</li>
+                <li><strong>Ứng suất Von-Mises:</strong> $\\sigma_{max} = 0.219\\text{ MPa}$.</li>
+                <li><strong>Chuyển vị lớn nhất:</strong> $\\delta = 8.69 \\times 10^{-5}\\text{ mm}$.</li>
+                <li><strong>Hệ số an toàn:</strong> <span style="color: var(--success); font-weight: bold;">$\\text{SF} \\gg 100$</span>.</li>
+              </ul>
+            </div>
+
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-rod-curved"></i> 3. Trục Truyền Động</div>
+              <ul class="bullet-list" style="font-size: 0.88rem;">
+                <li><strong>Vật liệu:</strong> Nhôm hợp kim ($\\sigma_y = 275\\text{ MPa}$).</li>
+                <li><strong>Ứng suất Von-Mises:</strong> $\\sigma_{max} = 1.671\\text{ MPa}$.</li>
+                <li><strong>Chuyển vị lớn nhất:</strong> $\\delta = 0.002\\text{ mm}$.</li>
+                <li><strong>Hệ số an toàn:</strong> <span style="color: var(--success); font-weight: bold;">$\\text{SF} = 164.0$</span>.</li>
+              </ul>
+            </div>
+          </div>
+        `,
+        speakerNote: "Giải thích kết quả CAE FEA: Hệ số an toàn rất lớn (SF=50-164) và biến dạng chỉ từ 0.08 - 4 micromet, chứng minh cụm cơ khí chịu tải 30kg cực kỳ vững chắc.",
+        script: `Để thẩm định thiết kế, nhóm đã tiến hành phân tích phần tử hữu hạn (FEA) trong trường hợp tải trọng xấu nhất (chịu toàn bộ lực dọc trục 66.24 N):<br><br>
+        1. Tấm gá đai ốc nhôm có ứng suất lớn nhất chỉ 5.48 MPa, hệ số an toàn SF = 50, chuyển vị lớn nhất chỉ 0.004 mm.<br>
+        2. Trục vít me bi có ứng suất 0.219 MPa, chuyển vị chỉ 0.08 micromet.<br>
+        3. Trục truyền động có hệ số an toàn 164.<br><br>
+        Kết quả này khẳng định kết cấu cơ khí hoàn toàn bền vững, không bị biến dạng đàn hồi làm ảnh hưởng đến độ chính xác động học.`
+      },
+      {
+        id: 14,
+        category: "CHƯƠNG III: THIẾT KẾ CƠ KHÍ",
+        title: "Không Gian Làm Việc & Phân Tích Kỳ Dị Jacobian",
+        body: `
+          <div class="slide-grid-2">
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-cube"></i> 1. Thiết Lập Ma Trận Jacobian Hệ 6-PUS</div>
+              <ul class="bullet-list" style="font-size: 0.88rem;">
+                <li>Phương trình vận tốc vi phân liên hệ: $J_d \\dot{d} = J_x \\begin{bmatrix} \\dot{t} \\\\ \\omega \\end{bmatrix}$</li>
+                <li>Ma trận nghịch: $\\mathbf{J_d = \\text{diag}(\\Delta_1, \\dots, \\Delta_6)} \\in \\mathbb{R}^{6 \\times 6}$</li>
+                <li>Ma trận thuận: $\\mathbf{J_x = \\begin{bmatrix} l_1^T & (r_{p,1} \\times l_1)^T \\\\ \\vdots & \\vdots \\\\ l_6^T & (r_{p,6} \\times l_6)^T \\end{bmatrix}} \\in \\mathbb{R}^{6 \\times 6}$</li>
+                <li>Chuẩn hóa: $J_{norm} = J_x W_{scale}, \\quad \\kappa(J_{norm}) = \\|J_{norm}\\| \\cdot \\|J_{norm}^{-1}\\|$</li>
+              </ul>
+            </div>
+
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-triangle-exclamation"></i> 2. Điều Kiện Ràng Buộc & Không Gian 3D</div>
+              <ul class="bullet-list" style="font-size: 0.88rem;">
+                <li><strong>Tránh Kỳ dị Loại I:</strong> $\\det(J_d) \\neq 0 \\iff \\Delta_i > 0$ (Không có thanh giằng nào nằm ngang).</li>
+                <li><strong>Tránh Kỳ dị Loại II:</strong> $|\\det(J_x)| \\ge 10^{-2}$ (Không mất khả năng khống chế tư thế).</li>
+                <li><strong>Chỉ số điều kiện:</strong> $\\kappa(J_{norm}) \\approx 5.2 \\dots 5.6 \\le 50.0$ (Đạt đẳng hướng tĩnh học rất cao).</li>
+              </ul>
+              <div class="success-box" style="margin-top: 6px;">
+                Vùng không gian 3D: $Z \\in [210, 310]\\text{ mm}$, $X, Y \\in \\pm 70\\text{ mm}$, góc nghiêng $\\pm 15^\\circ$.
+              </div>
+            </div>
+          </div>
+        `,
+        speakerNote: "Phân tích Jacobian: Chuẩn hóa đơn vị bằng Wscale, kiểm soát chỉ số điều kiện kappa <= 50 và tránh 2 loại kỳ dị để bệ không bao giờ bị kẹt cứng hoặc tự lắc.",
+        script: `Để đánh giá không gian làm việc và độ linh hoạt, nhóm thiết lập hai ma trận Jacobian thuận Jx và nghịch Jd.<br><br>
+        Để kết hợp nhất quán giữa đại lượng tịnh tiến (mm) và góc quay (rad), ma trận Jx được chuẩn hóa qua ma trận trọng số Wscale. Nhóm đặt ra các điều kiện biên nghiêm ngặt: <span class="stress-phrase">tránh kỳ dị loại I (khi thanh nối nằm ngang Δi=0), tránh kỳ dị loại II (khi det(Jx)=0 làm bệ bị lắc tự do), góc khớp ≤ 45° và chỉ số điều kiện κ(Jnorm) ≤ 50</span>.<br><br>
+        Mô phỏng 3D trên Matlab chứng minh vùng hoạt động của bệ bao phủ hoàn toàn dải chuyển động yêu cầu với độ đẳng hướng rất cao (κ chỉ từ 5.2 đến 5.6).`
+      },
+      {
+        id: 15,
+        category: "CHƯƠNG IV: THIẾT KẾ HỆ THỐNG ĐIỆN",
+        title: "Sơ Đồ Khối & Kiến Trúc Hệ Thống Điện Tổng Thể",
+        body: `
+          <div class="slide-grid-2">
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-network-wired"></i> 1. Cấu Trúc Phân Tầng Điều Khiển</div>
+              <ul class="bullet-list" style="font-size: 0.88rem;">
+                <li><strong>Tầng 1 (Host PC / Máy tính nhúng):</strong>
+                  <ul>
+                    <li>Tính toán động học nghịch (IK), xử lý file CSV.</li>
+                    <li>Giao diện Web Server giám sát & điều khiển.</li>
+                    <li>Giao tiếp USB CDC Full-Speed với vi điều khiển.</li>
+                  </ul>
+                </li>
+                <li><strong>Tầng 2 (Bộ điều khiển trung tâm STM32F446):</strong>
+                  <ul>
+                    <li>Nhận gói tin 20ms, thuật toán DDA đồng bộ 6 trục.</li>
+                    <li>Cơ chế bộ đệm kép Ping-Pong DMA phát xung 200kHz.</li>
+                    <li>Cổng nạp Firmware độc lập qua thẻ nhớ MicroSD (SDIO).</li>
+                  </ul>
+                </li>
+                <li><strong>Tầng 3 (Bộ công suất & Chấp hành):</strong>
+                  <ul>
+                    <li>6x Driver SSDC06-IP-Z nhận xung vi sai RS-422.</li>
+                    <li>6x Động cơ Stepper Hybrid AM23RS4DMA có hồi tiếp Encoder.</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-shield"></i> 2. Phân Tách Nguồn & Chống Nhiễu</div>
+              <ul class="bullet-list" style="font-size: 0.88rem;">
+                <li>Tách biệt hoàn toàn <strong>Nguồn Động Lực (24VDC - 600W)</strong> và <strong>Nguồn Điều Khiển (5VDC & 3.3VDC)</strong>.</li>
+                <li>Toàn bộ tín hiệu xung STEP/DIR được truyền qua chuẩn <strong>Vi Sai RS-422</strong> (IC SN75174N).</li>
+                <li>Tín hiệu cảm biến Home cách ly quang qua <strong>Optocoupler PC817</strong>.</li>
+                <li>Mạch <strong>E-Stop kép</strong> ngắt cứng rơ-le an toàn và ngắt mềm vi điều khiển.</li>
+              </ul>
+            </div>
+          </div>
+        `,
+        speakerNote: "Trình bày cấu trúc 3 tầng: Host PC (Debian) -> STM32F446 (Cortex-M4 180MHz) -> 6x Driver SSDC06-IP-Z. Tách nguồn và dùng RS-422 triệt nhiễu công nghiệp.",
+        script: `Chuyển sang Chương 4 - Thiết kế hệ thống điện. Hệ thống được tổ chức theo kiến trúc phân tầng 3 cấp:<br><br>
+        - Cấp 1 là Máy tính nhúng chạy Linux đóng vai trò Host, giải bài toán động học nghịch và chạy Web Server giao diện người dùng.<br>
+        - Cấp 2 là Vi điều khiển STM32F446ZET6 Cortex-M4 chạy ở 180 MHz, chịu trách nhiệm phát xung thời gian thực 200 kHz bằng thuật toán DDA và DMA, đồng thời hỗ trợ cập nhật Firmware qua thẻ SD.<br>
+        - Cấp 3 là 6 bộ Driver SSDC06 điều khiển 6 động cơ vòng kín.<br><br>
+        Hệ thống điện được thiết kế với tiêu chuẩn công nghiệp: tách biệt nguồn động lực 24V và nguồn logic 3.3V, truyền xung vi sai RS-422 và cách ly quang toàn bộ cảm biến.`
+      },
+      {
+        id: 16,
+        category: "CHƯƠNG IV: THIẾT KẾ HỆ THỐNG ĐIỆN",
+        title: "Lựa Chọn Vi Điều Khiển & Driver Động Cơ",
+        body: `
+          <div class="slide-grid-2">
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-microchip"></i> 1. MCU STM32F446ZET6 (LQFP144)</div>
+              <ul class="bullet-list" style="font-size: 0.88rem;">
+                <li><strong>Tần số CPU:</strong> ARM Cortex-M4F @ <strong>180 MHz</strong> (FPU tính toán nhanh).</li>
+                <li><strong>Bộ nhớ:</strong> 512 KB Flash, <strong>128 KB SRAM</strong>.</li>
+                <li><strong>Ngoại vi:</strong> 2 bộ DMA (16 Stream), Timer 1 nano-giây, USB OTG FS 12 Mbps, SDIO 48 MHz.</li>
+                <li><strong>Số chân I/O:</strong> 114 chân khả dụng (Hệ thống dùng 42 chân cho STEP/DIR/SON, End-stop, USB, SDIO, I2C, UART).</li>
+              </ul>
+            </div>
+
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-bolt-lightning"></i> 2. Driver MOONS SSDC06-IP-Z</div>
+              <ul class="bullet-list" style="font-size: 0.88rem;">
+                <li><strong>Chế độ:</strong> Closed-loop Servo Step mode (Vòng kín servo bước).</li>
+                <li><strong>Khả năng cấp dòng:</strong> Dòng liên tục 6 A/pha, dòng tăng cường <strong>7.5 A</strong> (1.5s).</li>
+                <li><strong>Điện áp:</strong> 24 – 70 VDC. Tần số xung $\le 500\\text{ kHz}$.</li>
+                <li><strong>Encoder:</strong> 4096 xung/vòng $\rightarrow$ Tự động bù bước nếu xảy ra trượt tải.</li>
+              </ul>
+            </div>
+          </div>
+        `,
+        speakerNote: "Giải thích lý do chọn STM32F446: Có 180MHz, 16 Stream DMA, USB FS 12Mbps, SDIO 48MHz và Driver SSDC06 hỗ trợ dòng đỉnh 7.5A cùng vòng kín Servo.",
+        script: `Về linh kiện điều khiển, nhóm chọn vi điều khiển <strong>STM32F446ZET6</strong> vỏ LQFP144 chân. Với xung nhịp 180 MHz, hỗ trợ 16 luồng DMA, giao tiếp SDIO và USB 2.0 Full-Speed, chip hoàn toàn đáp ứng yêu cầu xử lý thời gian thực mà không bị trễ ngắt.<br><br>
+        Đi kèm là bộ Driver <strong>MOONS SSDC06-IP-Z</strong> chuẩn công nghiệp, hỗ trợ dòng điện đỉnh 7.5A, giao tiếp vòng kín servo với encoder 4096 xung/vòng, giúp hệ thống hoàn toàn triệt tiêu nguy cơ mất bước ngay cả khi chịu tải dao động mạnh.`
+      },
+      {
+        id: 17,
+        category: "CHƯƠNG IV: THIẾT KẾ HỆ THỐNG ĐIỆN",
+        title: "Mạch Chống Nhiễu Vi Sai RS-422 & Cách Ly PC817",
+        body: `
+          <div class="slide-grid-2">
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-wave-square"></i> 1. Bộ Đệm Vi Sai RS-422 (IC SN75174N)</div>
+              <ul class="bullet-list" style="font-size: 0.88rem;">
+                <li>Tín hiệu STEP/DIR từ chân STM32 là mức logic <strong>TTL 3.3V</strong> đơn cực, rất dễ bị cảm ứng nhiễu điện từ từ cuộn dây động cơ.</li>
+                <li>IC SN75174N chuyển đổi sang cặp tín hiệu vi sai <strong>RS-422 (STEP+, STEP-, DIR+, DIR-)</strong>.</li>
+                <li><strong>Ưu điểm:</strong> Khử nhiễu đồng pha (Common-mode rejection), kéo dài dây dẫn tín hiệu an toàn.</li>
+              </ul>
+            </div>
+
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-eye"></i> 2. Mạch Cách Ly Cảm Biến (PC817)</div>
+              <ul class="bullet-list" style="font-size: 0.88rem;">
+                <li>Cảm biến tiệm cận LJ18A3 NPN hoạt động ở nguồn <strong>24 VDC</strong>, trong khi chân STM32 chỉ chịu tối đa 3.3V.</li>
+                <li>Sử dụng Optocoupler <strong>PC817</strong> cách ly quang hoàn toàn.</li>
+                <li>$$R = \\frac{24\\text{V} - 1.4\\text{V}}{5\\text{mA}} = 4.52\\text{ k}\\Omega \\implies \\text{Chọn } \\mathbf{4.7\\text{ k}\\Omega}$$</li>
+              </ul>
+            </div>
+          </div>
+        `,
+        speakerNote: "Trình bày rõ bài toán cách ly: Biến đổi 3.3V TTL sang vi sai RS-422 để chống nhiễu cuộn dây động cơ, và cách ly quang PC817 chuyển 24V cảm biến về 3.3V an toàn.",
+        script: `Trong môi trường thực tế, 6 động cơ bước công suất lớn đóng ngắt dòng điện liên tục sẽ sinh ra sóng hài và nhiễu điện từ EMI rất mạnh.<br><br>
+        Để đảm bảo tín hiệu xung không bị biến dạng, nhóm sử dụng IC <strong>SN75174N</strong> chuyển đổi toàn bộ tín hiệu STEP/DIR từ mức TTL 3.3V sang chuẩn vi sai RS-422 với khả năng triệt tiêu nhiễu đồng pha vượt trội.<br><br>
+        Đồng thời, 6 cảm biến tiệm cận 24V được cách ly quang hoàn toàn qua chip <strong>PC817</strong> với điện trở hạn dòng 4.7 kΩ tính toán chính xác, bảo vệ an toàn tuyệt đối cho chân GPIO vi điều khiển.`
+      },
+      {
+        id: 18,
+        category: "CHƯƠNG IV: THIẾT KẾ HỆ THỐNG ĐIỆN",
+        title: "Mạch Dừng Khẩn Cấp (E-Stop) Cơ Chế Bảo Vệ Kép",
+        body: `
+          <div class="slide-grid-2">
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-hand-holding-hand"></i> 1. Ngắt Cứng Phần Cứng ($T_{cut} < 30\\text{ ms}$)</div>
+              <ul class="bullet-list" style="font-size: 0.88rem;">
+                <li>Nút nhấn E-Stop cơ khí tiếp điểm NC nối tiếp cuộn dây <strong>Rơ-le an toàn PNOZ X2.8P (24VDC)</strong>.</li>
+                <li>Khi nút E-Stop bị nhấn $\\rightarrow$ Cuộn dây rơ-le mất điện lập tức $\\rightarrow$ Tiếp điểm lực NO mở ra.</li>
+                <li><strong>Cắt đứt trực tiếp đường nguồn 24VDC</strong> cấp vào 6 Driver động cơ trong thời gian $T_{cut} < 30\\text{ms}$.</li>
+              </ul>
+            </div>
+
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-code"></i> 2. Ngắt Mềm Firmware ($T_{sw} < 1.0\\ \\mu\\text{s}$)</div>
+              <ul class="bullet-list" style="font-size: 0.88rem;">
+                <li>Tín hiệu trước rơ-le qua cầu phân áp 3.3V nối chân ngắt ngoài <strong>KILL (PC5 EXTI)</strong> của STM32.</li>
+                <li>Khi phát hiện mức LOW, STM32 kích hoạt ngắt ngoài ưu tiên cao nhất: Dừng Timer 1, hủy luồng DMA, tắt chân Enable và báo về Host.</li>
+              </ul>
+            </div>
+          </div>
+        `,
+        speakerNote: "Điểm cộng lớn: Bảo vệ kép 2 lớp. Lớp 1 phần cứng ngắt nguồn 24V trong <30ms; Lớp 2 phần mềm ngắt xung Timer 1 trong <1 micro-giây.",
+        script: `An toàn là yếu tố sống còn đối với robot chuyển động công suất lớn. Đề tài xây dựng cơ chế <span class="stress-phrase">Bảo vệ an toàn kép 2 lớp</span> cho mạch Dừng khẩn cấp E-Stop:<br><br>
+        - Lớp 1 (Phần cứng): Nút nhấn E-Stop tác động trực tiếp vào Rơ-le an toàn PNOZ, cắt đứt hoàn toàn nguồn 24V động lực của 6 Driver trong thời gian dưới 30 ms.<br>
+        - Lớp 2 (Phần mềm): Tín hiệu được đưa đồng thời vào chân ngắt ngoài PC5 EXTI của STM32. Trong thời gian chưa đầy 1 micro-giây, vi điều khiển lập tức khóa cứng Timer 1, hủy luồng DMA, tắt chân Servo Enable và gửi cảnh báo khẩn cấp lên máy tính chủ.`
+      },
+      {
+        id: 19,
+        category: "CHƯƠNG IV: THIẾT KẾ HỆ THỐNG ĐIỆN",
+        title: "Tính Chọn Bộ Nguồn & Mạch Hạ Áp DC-DC",
+        body: `
+          <div class="slide-grid-2">
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-plug"></i> 1. Nguồn Chính 24VDC - 600W</div>
+              <ul class="bullet-list" style="font-size: 0.86rem;">
+                <li>6 Động cơ Stepper Hybrid ($24\\text{V} \\times 4.1\\text{A} \\times 0.8$): $472.32\\text{ W}$.</li>
+                <li>Máy tính nhúng (10W), Cảm biến (3W), Mạch MCU (5W).</li>
+                <li>Tổng công suất: $P = 490.32\\text{ W}$. Nhân hệ số $K=1.2 \\implies \\mathbf{P_{total} = 588.38\\text{ W}}$ ($I = 24.52\\text{A}$).</li>
+                <li><strong>Chọn Nguồn:</strong> <span style="color: var(--primary); font-weight: bold;">Omron S8FS-G60024CD (24V - 27A - 600W)</span>.</li>
+              </ul>
+            </div>
+
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-charging-station"></i> 2. Buck SY8368A & LDO RT9193</div>
+              <ul class="bullet-list" style="font-size: 0.86rem;">
+                <li><strong>Buck $24\\text{V} \\rightarrow 5\\text{V}$ (IC SY8368A - 8A):</strong>
+                  <ul>
+                    <li>$V_{REF} = 0.6\\text{V}, R_1 = 100\\text{k}\\Omega, R_2 = 13.7\\text{k}\\Omega \\implies \\mathbf{V_{OUT} = 4.978\\text{V}}$ (Sai số $0.44\\%$).</li>
+                    <li>$f_{sw} = 800\\text{ kHz}$, $L = 1.5\\ \\mu\\text{H}$ ($I_{SAT} \\ge 12\\text{A}$), $C_{OUT} = 66\\ \\mu\\text{F}$.</li>
+                  </ul>
+                </li>
+                <li><strong>LDO $5\\text{V} \\rightarrow 3.3\\text{V}$ (IC RT9193-33GB - 300mA):</strong> Cấp điện áp sạch cho MCU STM32.</li>
+              </ul>
+            </div>
+          </div>
+        `,
+        speakerNote: "Tổng công suất hệ thống 490.3W, chọn nguồn Omron 600W 27A. Mạch Buck SY8368A 8A hiệu suất 92% và LDO RT9193 chống sụt áp nguồn logic.",
+        script: `Tổng công suất tiêu thụ của 6 động cơ và toàn bộ mạch điều khiển tính được là 490.3W. Nhân hệ số an toàn 1.2, nhóm chọn bộ nguồn công nghiệp <strong>Omron S8FS 24V-27A 600W</strong>.<br><br>
+        Để hạ áp từ 24V xuống 5V cấp cho mạch cách ly, nhóm sử dụng IC chuyển mạch Buck đồng bộ <strong>SY8368A</strong> tần số 800 kHz, dòng tải định mức lên đến 8A với cuộn cảm 1.5 µH dòng bão hòa 12A và tụ lọc MLCC 66 µF.<br><br>
+        Sau đó dùng tiếp LDO chống nhiễu <strong>RT9193</strong> hạ từ 5V xuống 3.3V cho STM32, đảm bảo nguồn cấp sạch tuyệt đối.`
+      },
+      {
+        id: 20,
+        category: "CHƯƠNG V: THIẾT KẾ BỘ ĐIỀU KHIỂN",
+        title: "Giải Bài Toán Động Học Nghịch (Inverse Kinematics)",
+        body: `
+          <div class="slide-grid-2">
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-square-root-variable"></i> 1. Chuyển Đổi Bằng Quaternion</div>
+              <ul class="bullet-list" style="font-size: 0.88rem;">
+                <li>Đầu vào tư thế bệ động: Vector tịnh tiến $t = [x, y, z]^T$ và Unit Quaternion $q = [q_w, q_x, q_y, q_z]^T$ (tránh khóa góc Gimbal Lock).</li>
+                <li>Tọa độ khớp bệ động toàn cục: $P_i = t + R \\cdot P_{local,i} \\quad (i = 1 \\dots 6)$</li>
+                <li>Vector chân ảo: $q_i = P_i - B_{0,i} = [q_{i,x}, q_{i,y}, \\Delta_i]^T$</li>
+              </ul>
+            </div>
+
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-calculator"></i> 2. Tính Hành Trình Con Trượt $d_i$</div>
+              <ul class="bullet-list" style="font-size: 0.88rem;">
+                <li>Khoảng cách phương $Z$: $\\Delta_i = \\sqrt{L^2 - (q_{i,x}^2 + q_{i,y}^2)}$</li>
+                <li>Hành trình tịnh tiến: $\\mathbf{d_i = h - \\Delta_i}$</li>
+                <li>Số xung điều khiển: $\\mathbf{S_i = \\frac{d_i}{P_h} \\times N_{steps/rev}}$</li>
+              </ul>
+            </div>
+          </div>
+        `,
+        speakerNote: "Giải thích thuật toán IK: Sử dụng Unit Quaternion tránh Gimbal Lock, tính vector chân ảo qi và suy ra vị trí tịnh tiến di của 6 con trượt trong chu kỳ 20ms.",
+        script: `Bước sang Chương 5 - Thiết kế bộ điều khiển. Để điều khiển bệ động đạt tư thế mong muốn, Host PC phải giải bài toán động học nghịch.<br><br>
+        Thay vì dùng góc Euler dễ bị khóa trục Gimbal Lock, nhóm sử dụng <span class="stress-phrase">Unit Quaternion</span> để biểu diễn ma trận xoay R. Từ tọa độ đỉnh bệ động Pi và chiều dài thanh giằng cố định L = 230 mm, phương trình hình học khép kín cho phép tính trực tiếp độ dịch chuyển tịnh tiến di của 6 con trượt trên trục vít me.<br><br>
+        Kết quả này được quy đổi ra số bước mục tiêu Si gửi xuống vi điều khiển.`
+      },
+      {
+        id: 21,
+        category: "CHƯƠNG V: THIẾT KẾ BỘ ĐIỀU KHIỂN",
+        title: "Thuật Toán DDA (Digital Differential Analyzer) 6 Trục Đồng Bộ",
+        body: `
+          <div class="slide-grid-2">
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-gears"></i> 1. Bản Chất Toán Học Của DDA</div>
+              <ul class="bullet-list" style="font-size: 0.88rem;">
+                <li><strong>Mục tiêu:</strong> 6 trục xuất phát đồng thời và hoàn thành chính xác số bước $S_i$ tại cùng một thời điểm $T$ ($4000\\text{ ticks} = 20\\text{ms}$).</li>
+                <li>Tốc độ tích lũy: $\\mathbf{V_i = \\frac{S_i \\times L_{scale}}{T}}$ (với $L_{scale} = 65536$).</li>
+                <li>Vòng lặp nhịp $5\\ \\mu\\text{s}$:
+                  $$A_i \\leftarrow A_i + V_i$$
+                  $$\\text{Nếu } A_i \\ge L_{scale} \\implies \\text{Bắn xung, } A_i \\leftarrow A_i - L_{scale}$$
+                </li>
+              </ul>
+            </div>
+
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-wand-magic-sparkles"></i> 2. Ưu Điểm Tuyệt Đối</div>
+              <ul class="bullet-list" style="font-size: 0.88rem;">
+                <li><strong>Toán số nguyên 100%:</strong> Không dùng phép chia số thực trong ngắt $5\\ \\mu\\text{s}$.</li>
+                <li><strong>Phân bố xung cực đều:</strong> Triệt tiêu hiện tượng giật cục cơ khí.</li>
+                <li><strong>Đồng bộ pha tuyệt đối:</strong> Trục đi ngắn tự động quay chậm, trục đi dài tự động quay nhanh.</li>
+              </ul>
+              <div class="success-box" style="margin-top: 8px;">
+                Đảm bảo tần số phát xung cực đại lên tới <strong>200 kHz</strong> mà không làm méo bước.
+              </div>
+            </div>
+          </div>
+        `,
+        speakerNote: "Nhấn mạnh bản chất DDA: Dùng bộ tích lũy số nguyên (Accumulator), phân phối xung đều đặn theo thời gian thực 200kHz mà không cần tính toán số thực nặng.",
+        script: `Để 6 trục chuyển động đồng bộ mượt mà mà không làm vặn xoắn cơ cấu, nhóm áp dụng <span class="stress-phrase">Thuật toán DDA (Digital Differential Analyzer)</span>.<br><br>
+        Bản chất của DDA là sử dụng bộ tích lũy số nguyên. Mỗi nhịp 5 micro-giây, CPU cộng thêm một lượng vận tốc Vi vào thanh ghi tích lũy Ai. Khi Ai vượt qua ngưỡng tràn L (65536), một xung STEP được phát ra và Ai trừ đi L.<br><br>
+        Giải thuật này loại bỏ 100% các phép tính số thực phức tạp trong vòng lặp thời gian thực, đảm bảo trục dài chạy nhanh, trục ngắn chạy chậm và tất cả 6 trục luôn luôn về đích cùng một lúc một cách êm ái.`
+      },
+      {
+        id: 22,
+        category: "CHƯƠNG V: THIẾT KẾ BỘ ĐIỀU KHIỂN",
+        title: "Giao Thức Truyền Thông USB CDC Full-Speed & Phân Tích Độ Trễ",
+        body: `
+          <div class="slide-grid-2">
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-envelope"></i> 1. Cấu Trúc Gói Tin 15-Byte Nhị Phân</div>
+              <div class="code-block">[0xAA] + ['M'] + [ΔS1..ΔS6 (12 Bytes)] + [CRC8]</div>
+              <ul class="bullet-list" style="font-size: 0.86rem;">
+                <li>Kích thước cố định <strong>15 Bytes</strong> (truyền 6 trục dạng <code>int16_t</code>).</li>
+                <li>Cơ chế bắt tay: <code>'K'</code> (ACK), <code>'N'</code> (NACK), <code>'D'</code> (DONE - Hoàn tất 20ms).</li>
+              </ul>
+            </div>
+
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-stopwatch-20"></i> 2. Độ Trễ Thời Gian Thực</div>
+              <ul class="bullet-list" style="font-size: 0.86rem;">
+                <li>Thời gian truyền phần cứng USB 12 Mbps: $t_{hw} = \\mathbf{0.010\\text{ ms}}$.</li>
+                <li>Thời gian giải mã ngắt CPU ($2700\\text{ cycles}$): $t_{cpu} = \\mathbf{0.015\\text{ ms}}$.</li>
+                <li>Tổng độ trễ: $\\mathbf{t_{latency} = 0.025\\text{ ms}} \\ll 2.5\\text{ms}$ (An toàn gấp 100 lần).</li>
+              </ul>
+            </div>
+          </div>
+        `,
+        speakerNote: "Chứng minh: Gói tin 15-byte USB CDC có tổng độ trễ truyền và giải mã chỉ 0.025 ms, nhỏ hơn 100 lần so với giới hạn an toàn 2.5 ms.",
+        script: `Quá trình truyền nhận dữ liệu giữa Host PC và STM32 diễn ra qua chuẩn USB CDC Full-Speed 12 Mbps với gói tin nhị phân chuẩn hóa 15 bytes có mã kiểm tra CRC8.<br><br>
+        Nhóm đã tính toán chính xác tổng độ trễ: Thời gian truyền dẫn vật lý qua bus USB là 0.010 ms, thời gian thực thi hàm ngắt giải mã của CPU là 0.015 ms. <span class="stress-phrase">Tổng độ trễ trọn gói chỉ là 0.025 ms</span>.<br><br>
+        Con số này nhỏ hơn giới hạn an toàn 2.5 ms tới 100 lần, đảm bảo gói tin mới luôn được nạp sẵn vào hàng đợi trước khi gói tin cũ phát hết, triệt tiêu hoàn toàn hiện tượng nghẽn mạng.`
+      },
+      {
+        id: 23,
+        category: "CHƯƠNG VI: GIẢI THUẬT HỆ THỐNG",
+        title: "Quy Trình Homing 5 Bước Độ Chính Xác Cao",
+        body: `
+          <div class="slide-card">
+            <div class="slide-card-title"><i class="fa-solid fa-crosshairs"></i> Chu Trình Tự Động Định Vị Điểm Gốc (Zero-Calibration)</div>
+            <div class="flow-steps">
+              <div class="flow-step active">1. Nhận Lệnh 'H'</div>
+              <div class="flow-arrow">➔</div>
+              <div class="flow-step">2. Dò Thô (Fast)</div>
+              <div class="flow-arrow">➔</div>
+              <div class="flow-step">3. Lùi Nhả Nút (Backoff)</div>
+              <div class="flow-arrow">➔</div>
+              <div class="flow-step">4. Dò Tinh (Slow)</div>
+              <div class="flow-arrow">➔</div>
+              <div class="flow-step">5. Đặt Mốc 0</div>
+            </div>
+
+            <div class="slide-grid-2" style="margin-top: 10px;">
+              <div>
+                <ul class="bullet-list" style="font-size: 0.88rem;">
+                  <li><strong>Bước 1:</strong> Host gửi <code>'H'</code>, MCU chuyển trạng thái Homing.</li>
+                  <li><strong>Bước 2 (Dò thô):</strong> 6 trục lùi về cảm biến. Trục nào chạm trước dừng trục đó trước.</li>
+                  <li><strong>Bước 3 (Lùi nhả):</strong> Lùi nhẹ 100 bước để cảm biến nhả tự do hoàn toàn.</li>
+                </ul>
+              </div>
+              <div>
+                <ul class="bullet-list" style="font-size: 0.88rem;">
+                  <li><strong>Bước 4 (Dò tinh):</strong> Tiến lại với tốc độ 1/10 để triệt tiêu trớn quán tính.</li>
+                  <li><strong>Bước 5:</strong> Đặt bộ đếm tọa độ 6 trục về $0$, gửi phản hồi <code>'Homing Done'</code>.</li>
+                  <li><strong>Bảo vệ Timeout:</strong> Sau 15s chưa chạm $\rightarrow$ Ngắt an toàn.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        `,
+        speakerNote: "Giải thích 5 bước Homing: Bước 3 và Bước 4 là chìa khóa công nghệ giúp triệt tiêu sai số quán tính cơ học, đạt độ chính xác định vị gốc 0 dưới 0.05mm.",
+        script: `Trước khi chạy mô phỏng, hệ thống bắt buộc phải thực hiện quy trình Homing để thiết lập gốc tọa độ chuẩn cho cả 6 trục. Đề tài xây dựng quy trình Homing 5 bước độ chính xác cao:<br><br>
+        - Bước 1: Nhận lệnh Homing từ Host.<br>
+        - Bước 2: Dò thô với tốc độ nhanh để tiết kiệm thời gian.<br>
+        - Bước 3 & 4: <span class="stress-phrase">Lùi nhẹ ra xa để nhả cảm biến, sau đó tiến lại lần 2 với tốc độ siêu chậm</span>. Bước này giúp loại bỏ hoàn toàn sai số trớn do quán tính cơ học.<br>
+        - Bước 5: Đặt mốc số 0 và kích hoạt Timer an toàn chống kẹt cơ.`
+      },
+      {
+        id: 24,
+        category: "CHƯƠNG VI: GIẢI THUẬT HỆ THỐNG",
+        title: "Cơ Chế Bộ Đệm Kép Ping-Pong (Double Buffering) DMA + Timer",
+        body: `
+          <div class="slide-grid-2">
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-memory"></i> 1. Tối Ưu Hóa Bộ Nhớ SRAM</div>
+              <ul class="bullet-list" style="font-size: 0.86rem;">
+                <li>Nếu lưu toàn bộ xung 20ms (4000 ticks): $\\text{RAM} = \\mathbf{192\\text{ KB}} > 128\\text{ KB (Tràn RAM)}$.</li>
+                <li><strong>Đệm Kép Ping-Pong:</strong> Chia thành <strong>4 block 5ms</strong> (1000 ticks):
+                  $$\\text{RAM} = 1000 \\times 2 \\times 4\\text{B} \\times 3 \\times 2 = \\mathbf{48\\text{ KB}} \\quad (\\mathbf{37.5\\%}\\text{ SRAM})$$
+                </li>
+              </ul>
+            </div>
+
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-microchip"></i> 2. Phối Hợp Phần Cứng DMA & CPU</div>
+              <ul class="bullet-list" style="font-size: 0.86rem;">
+                <li><strong>CPU:</strong> Pre-compute dữ liệu GPIO BSRR cho 5ms tiếp theo vào Buffer rảnh.</li>
+                <li><strong>DMA + Timer 1:</strong> Tự động đẩy Buffer đang phát ra BSRR (CPU Load = 0%).</li>
+                <li><strong>Tráo Đổi (Ngắt TCIF):</strong> Độ trễ chuyển đệm = 0 ms!</li>
+              </ul>
+            </div>
+          </div>
+        `,
+        speakerNote: "Điểm nhấn kỹ thuật xuất sắc nhất: Chia 20ms thành 4 block 5ms giúp giảm RAM từ 192KB xuống 48KB, dùng DMA tự phát xung giúp CPU Load = 0%.",
+        script: `Đây là đóng góp kỹ thuật cốt lõi nhất của phần Firmware: Cơ chế <span class="stress-phrase">Bộ đệm kép Ping-Pong (Double-Buffering) kết hợp DMA</span>.<br><br>
+        Thách thức là nếu đệm toàn bộ xung 20ms của 6 trục, vi điều khiển cần tới 192 KB RAM, vượt quá bộ nhớ 128 KB của chip. Nhóm đã sáng tạo chia nhỏ lệnh 20ms thành 4 phân đoạn 5ms (1000 ticks DDA). Dung lượng RAM yêu cầu giảm xuống chỉ còn 48 KB (chiếm 37.5% SRAM).<br><br>
+        Trong khi DMA phần cứng tự động bơm dữ liệu từ RAM ra thanh ghi GPIO BSRR với tải CPU bằng 0%, CPU chạy ngầm ở vòng lặp chính để tính trước dữ liệu cho phân đoạn tiếp theo. Khi DMA phát xong 5ms, ngắt phần cứng lập tức hoán đổi đệm với độ trễ bằng 0 ms, đảm bảo dòng xung phát ra liên tục tuyệt đối.`
+      },
+      {
+        id: 25,
+        category: "CHƯƠNG VI: GIẢI THUẬT HỆ THỐNG",
+        title: "Lưu Đồ Chu Trình Vận Hành Toàn Hệ Thống (System Cycle)",
+        body: `
+          <div class="slide-card">
+            <div class="slide-card-title"><i class="fa-solid fa-diagram-project"></i> Máy Trạng Thái Toàn Cục (Global System State Machine)</div>
+            <div class="slide-grid-3" style="margin-top: 8px;">
+              <div class="slide-card" style="background: rgba(15, 23, 42, 0.6);">
+                <strong style="color: var(--primary);">1. INIT & IDLE</strong>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">
+                  Clock 180MHz, TIM1, DMA, GPIO. Lắng nghe USB CDC.
+                </p>
+              </div>
+
+              <div class="slide-card" style="background: rgba(15, 23, 42, 0.6);">
+                <strong style="color: var(--warning);">2. RUNNING</strong>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">
+                  Nhận lệnh 'M', DDA Ping-Pong 5ms, DMA phát xung, gửi 'D' khi xong 20ms.
+                </p>
+              </div>
+
+              <div class="slide-card" style="background: rgba(15, 23, 42, 0.6);">
+                <strong style="color: var(--danger);">3. ESTOP</strong>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">
+                  Khóa Timer 1 và DMA, kéo STEP về HIGH, ngắt Servo Enable.
+                </p>
+              </div>
+            </div>
+
+            <div class="highlight-box" style="margin-top: 10px; font-size: 0.88rem;">
+              <strong>🔄 Chu trình đồng bộ:</strong> Host gửi gói $\\rightarrow$ STM32 phản hồi ACK $\\rightarrow$ DMA phát xung $\\rightarrow$ Gửi DONE $\\rightarrow$ Host gửi gói tiếp.
+            </div>
+          </div>
+        `,
+        speakerNote: "Tóm tắt máy trạng thái: INIT -> HOMING -> IDLE -> RUNNING (Ping-Pong DMA) -> ESTOP an toàn. Vòng tròn đồng bộ khép kín qua tín hiệu bắt tay.",
+        script: `Lưu đồ tổng thể kết nối toàn bộ hoạt động của hệ thống thành một máy trạng thái hoàn chỉnh: Khởi tạo phần cứng, thực hiện Homing, chuyển sang IDLE chờ lệnh, xử lý luồng RUNNING thông qua cơ chế Ping-Pong DMA, và chuyển sang trạng thái ngắt an toàn ESTOP khi có sự cố.<br><br>
+        Sự phối hợp chặt chẽ giữa máy tính nhúng và vi điều khiển tạo nên một chuỗi vận hành khép kín, ổn định và tin cậy.`
+      },
+      {
+        id: 26,
+        category: "CHƯƠNG VII: MÔ PHỎNG VÀ ĐÁNH GIÁ",
+        title: "Thiết Lập Mô Hình Thực Nghiệm & Chuẩn Bị Dữ Liệu Sóng",
+        body: `
+          <div class="slide-grid-2">
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-laptop-code"></i> 1. Chuỗi Xử Lý Dữ Liệu Thực Nghiệm</div>
+              <ul class="bullet-list" style="font-size: 0.86rem;">
+                <li><strong>Bước 1:</strong> Dữ liệu sóng biển vào Matlab $\\rightarrow$ Giải IK $\\rightarrow$ Xuất CSV (20ms).</li>
+                <li><strong>Bước 2:</strong> Web Server Python (Raspi) $\\rightarrow$ Gửi lệnh qua USB CDC.</li>
+                <li><strong>Bước 3:</strong> STM32 nhận lệnh và phát xung STEP/DIR ra 6 động cơ.</li>
+                <li><strong>Bước 4:</strong> Dùng <strong>Logic Analyzer</strong> đo 6 kênh xung thực tế $\\rightarrow$ File log.</li>
+              </ul>
+            </div>
+
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-cubes"></i> 2. Mô Phỏng Động Lực Học RecurDyn</div>
+              <ul class="bullet-list" style="font-size: 0.86rem;">
+                <li><strong>Bước 5:</strong> Đưa log xung vào Matlab <strong>tính ngược lại chuyển vị $d_i(t)$</strong>.</li>
+                <li><strong>Bước 6:</strong> Nạp hàm <code>STEP(Time,...)</code> vào khớp Screw trong <strong>RecurDyn</strong>.</li>
+                <li><strong>Bước 7:</strong> Trích xuất chuyển động 6-DOF thực tế của bệ động.</li>
+              </ul>
+            </div>
+          </div>
+        `,
+        speakerNote: "Giải thích quy trình kiểm chứng thực nghiệm: Dữ liệu sóng -> Matlab -> CSV -> Web Server -> MCU STM32 -> Đo Logic Analyzer -> Tính ngược -> RecurDyn.",
+        script: `Để đánh giá chính xác hiệu năng hệ thống, nhóm đã xây dựng một quy trình thực nghiệm nghiêm ngặt kết hợp giữa phần cứng thực và mô phỏng động lực học đa vật thể (MBD):<br><br>
+        Từ dữ liệu sóng biển, Matlab tính ra quỹ đạo số bước xuất file CSV. Web Server trên Raspberry Pi truyền dữ liệu qua USB xuống vi điều khiển STM32. Khi STM32 phát xung, nhóm dùng <span class="stress-phrase">Thiết bị phân tích Logic Analyzer phần cứng</span> cắm trực tiếp vào các chân GPIO để đo đạc chính xác từng xung STEP và mức tín hiệu DIR thực tế.<br><br>
+        Dữ liệu xung thực tế này được đưa ngược lại Matlab để khôi phục hành trình và nạp vào phần mềm <strong>RecurDyn</strong> để đánh giá chuyển động thực tế của bệ.`
+      },
+      {
+        id: 27,
+        category: "CHƯƠNG VII: MÔ PHỎNG VÀ ĐÁNH GIÁ",
+        title: "Kết Quả Đo Xung MCU & Mô Phỏng RecurDyn",
+        body: `
+          <div class="slide-grid-2">
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-microchip"></i> 1. Kết Quả Đo Logic Analyzer (4s)</div>
+              <div class="table-responsive">
+                <table class="slide-table" style="font-size: 0.84rem;">
+                  <tr><th>Chân</th><th>Xung mong muốn</th><th>Xung đo được</th><th>Thời gian</th></tr>
+                  <tr><td><strong>M0</strong></td><td>417446</td><td><strong>417446</strong></td><td>$4.00152\\text{ s}$</td></tr>
+                  <tr><td><strong>M1</strong></td><td>251150</td><td><strong>251158</strong> (+8)</td><td>$4.00152\\text{ s}$</td></tr>
+                  <tr><td><strong>M2</strong></td><td>192642</td><td><strong>192642</strong></td><td>$4.00151\\text{ s}$</td></tr>
+                  <tr><td><strong>M3</strong></td><td>192642</td><td><strong>192642</strong></td><td>$4.00151\\text{ s}$</td></tr>
+                  <tr><td><strong>M4</strong></td><td>251150</td><td><strong>251158</strong> (+8)</td><td>$4.00157\\text{ s}$</td></tr>
+                  <tr><td><strong>M5</strong></td><td>417446</td><td><strong>417446</strong></td><td>$4.00152\\text{ s}$</td></tr>
+                </table>
+              </div>
+              <div class="highlight-box" style="font-size: 0.82rem; margin-top: 6px;">
+                Độ sai lệch thời gian chỉ $0.03\\%$, chân M1 & M4 lệch đúng 8 xung do làm tròn DDA.
+              </div>
+            </div>
+
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-vr-cardboard"></i> 2. Mô Hình RecurDyn</div>
+              <ul class="bullet-list" style="font-size: 0.86rem;">
+                <li>Khớp: Fixed, Universal, Screw, Spherical.</li>
+                <li>Khảo sát 2 kịch bản sóng biển thực tế:
+                  <ul>
+                    <li><strong>Kịch bản 1:</strong> Sóng ngang (Heave 35mm, Roll 3.8°, Sway 30mm).</li>
+                    <li><strong>Kịch bản 2:</strong> Sóng dọc (Pitch 15.8°, Heave 15mm).</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+        `,
+        speakerNote: "Giải thích kết quả đo Logic Analyzer: Số xung thực tế khớp 99.998% (M0, M2, M3, M5 khớp tuyệt đối, M1 và M4 chỉ lệch 8 xung trong 251.150 xung).",
+        script: `Kết quả đo đạc thực tế trên Logic Analyzer trong 4 giây phát chuyển động cho thấy: Các trục M0, M2, M3, M5 đạt chính xác tuyệt đối 100% số xung (417446 và 192642 xung). Riêng trục M1 và M4 có độ lệch 8 xung trên tổng số hơn 251 nghìn xung do sai số làm tròn khi chia nhỏ phân đoạn DDA.<br><br>
+        Tổng thời gian phát xung đo được là 4.0015 giây, độ sai lệch thời gian chỉ là 0.03%. Toàn bộ dữ liệu này được gán vào mô hình cơ cấu trong RecurDyn để chạy mô phỏng 2 kịch bản sóng biển thực tế.`
+      },
+      {
+        id: 28,
+        category: "CHƯƠNG VII: MÔ PHỎNG VÀ ĐÁNH GIÁ",
+        title: "Đánh Giá Sai Số & Thẩm Định Động Lực Học",
+        body: `
+          <div class="slide-grid-2">
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-chart-column"></i> 1. Kịch Bản 1 (Sóng Ngang)</div>
+              <div class="table-responsive">
+                <table class="slide-table" style="font-size: 0.84rem;">
+                  <tr><th>Bậc tự do</th><th>Giá trị mong muốn</th><th>Sai số max</th><th>% Sai số</th></tr>
+                  <tr><td><strong>Roll ($\\phi$)</strong></td><td>$3.8^\\circ \\sin(\\frac{2\\pi}{1.5}t)$</td><td><strong>$0.130^\\circ$</strong></td><td>$3.15\\%$</td></tr>
+                  <tr><td><strong>Sway ($Y$)</strong></td><td>$30\\text{mm} \\sin(\\frac{2\\pi}{1.5}t)$</td><td><strong>$1.050\\text{ mm}$</strong></td><td>$3.50\\%$</td></tr>
+                  <tr><td><strong>Heave ($Z$)</strong></td><td>$35\\text{mm} \\sin(\\frac{2\\pi}{1.5}t)$</td><td><strong>$1.200\\text{ mm}$</strong></td><td>$3.40\\%$</td></tr>
+                  <tr><td>Pitch / Yaw</td><td>$0^\\circ$</td><td>$0.000^\\circ$</td><td>$0\\%$</td></tr>
+                </table>
+              </div>
+            </div>
+
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-magnifying-glass-chart"></i> 2. Kịch Bản 2 & Nguyên Nhân Sai Số</div>
+              <ul class="bullet-list" style="font-size: 0.86rem;">
+                <li><strong>Kịch bản 2:</strong> Pitch ($15.8^\\circ$) sai số <strong>$0.1313^\\circ$</strong>; Heave ($15\\text{mm}$) sai số <strong>$0.518\\text{ mm}$</strong>.</li>
+                <li><strong>Nguyên nhân chính gây ra sai số $\\approx 3.4\\%$:</strong>
+                  <ol style="margin-left: 16px; margin-top: 4px;">
+                    <li><strong>Rời rạc hóa lấy mẫu $0.02\\text{s}$:</strong> Quỹ đạo có dạng bậc thang thay vì sin liên tục.</li>
+                    <li><strong>Lệch 8 xung vi điều khiển:</strong> Tương đương $\\approx 0.008\\text{mm}$.</li>
+                  </ol>
+                </li>
+              </ul>
+              <div class="success-box" style="margin-top: 6px;">
+                Sai số $\\le 3.5\\%$ hoàn toàn đáp ứng tốt cho ứng dụng bệ thử mô phỏng hàng hải.
+              </div>
+            </div>
+          </div>
+        `,
+        speakerNote: "Phân tích thẳng thắn nguyên nhân sai số ~3.4%: Do chu kỳ lấy mẫu 0.02s dạng bậc thang rời rạc. Sai số góc chỉ 0.13 độ và hành trình chỉ 1mm, hoàn toàn đạt chỉ tiêu.",
+        script: `Kết quả mô phỏng trên RecurDyn cho thấy: Ở Kịch bản 1, sai số góc Roll lớn nhất là 0.13 độ (3.15%), sai số tịnh tiến Sway là 1.05 mm (3.5%) và Heave là 1.2 mm (3.4%). Ở Kịch bản 2, sai số góc Pitch chỉ là 0.131 độ và Heave là 0.518 mm.<br><br>
+        Nhóm đã phân tích sâu nguyên nhân: Sai số này chủ yếu xuất phát từ việc <span class="stress-phrase">rời rạc hóa chu kỳ lấy mẫu 0.02 giây</span> biến hàm sin liên tục thành các đoạn nấc thang vi phân, cộng thêm độ lệch 8 xung của MCU. Mức sai số dưới 3.5% này hoàn toàn nằm trong giới hạn cho phép và đáp ứng xuất sắc mục tiêu đề ra.`
+      },
+      {
+        id: 29,
+        category: "CHƯƠNG VIII: KẾT LUẬN",
+        title: "Kết Luận & Những Đóng Góp Cốt Lõi Của Đề Tài",
+        body: `
+          <div class="slide-grid-2">
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-award"></i> 1. Các Kết Quả Đã Đạt Được</div>
+              <ul class="bullet-list" style="font-size: 0.88rem;">
+                <li><strong>Thiết kế cơ khí 6-PUS:</strong> SFU1204, động cơ MOONS 2.5 N.m, kiểm nghiệm FEA bền vững với hệ số $\\text{SF} \\ge 50$.</li>
+                <li><strong>Jacobian & Không gian:</strong> Chứng minh bệ không kỳ dị, độ đẳng hướng cao ($\\kappa \\le 5.6$).</li>
+                <li><strong>Điện tử công nghiệp:</strong> RS-422, cách ly quang PC817, E-Stop kép ($<30\\text{ms}$ và $<1\\ \\mu\\text{s}$).</li>
+                <li><strong>Firmware DDA 200kHz Ping-Pong:</strong> Tối ưu RAM từ 192KB xuống 48KB, DMA giải phóng 100% CPU.</li>
+              </ul>
+            </div>
+
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-star"></i> 2. Giá Trị Thực Tiễn</div>
+              <ul class="bullet-list" style="font-size: 0.88rem;">
+                <li>Giải pháp <strong>Bệ Thử Chuyển Động Khô</strong> chi phí thấp, tin cậy cao thay thế bể sóng đắt đỏ.</li>
+                <li>Quy trình thực nghiệm khép kín từ Matlab $\\rightarrow$ Web Server $\\rightarrow$ MCU $\\rightarrow$ Đo Logic Analyzer $\\rightarrow$ RecurDyn.</li>
+                <li>Hoàn thành xuất sắc toàn bộ chỉ tiêu kỹ thuật.</li>
+              </ul>
+            </div>
+          </div>
+        `,
+        speakerNote: "Tóm tắt 4 trụ cột đóng góp: 1. Thiết kế cơ khí 6-PUS tối ưu; 2. Điện tử công nghiệp chuẩn RS-422 & E-Stop kép; 3. Firmware DDA Ping-Pong DMA 200kHz; 4. Kiểm chứng RecurDyn hoàn chỉnh.",
+        script: `Tóm lại, đề tài đã hoàn thành xuất sắc toàn bộ các mục tiêu đặt ra với 4 đóng góp kỹ thuật nổi bật:<br><br>
+        1. Thiết kế và kiểm nghiệm hoàn chỉnh cơ cấu cơ khí 6-PUS chịu tải 30 kg với hệ số an toàn FEA trên 50.<br>
+        2. Thiết kế hệ thống điện tử chuẩn công nghiệp với đường truyền vi sai RS-422 và hệ thống an toàn kép E-Stop.<br>
+        3. Phát triển thành công thuật toán DDA 200 kHz kết hợp cơ chế bộ đệm kép Ping-Pong DMA, giải quyết triệt để bài toán tràn RAM và quá tải CPU.<br>
+        4. Xây dựng quy trình đo đạc thực nghiệm và mô phỏng động lực học RecurDyn, chứng minh bệ mô phỏng đạt độ chính xác cao với sai số dưới 3.5%.`
+      },
+      {
+        id: 30,
+        category: "CHƯƠNG VIII: KẾT LUẬN",
+        title: "Hướng Phát Triển & Lời Cảm Ơn",
+        body: `
+          <div class="slide-grid-2">
+            <div class="slide-card">
+              <div class="slide-card-title"><i class="fa-solid fa-compass"></i> 1. Hướng Phát Triển Tiếp Theo</div>
+              <ul class="bullet-list" style="font-size: 0.88rem;">
+                <li><strong>Cảm biến IMU 9-DOF thời gian thực:</strong> Vòng điều khiển kín động học bù trừ sai số cơ học.</li>
+                <li><strong>Thử nghiệm bù sóng (AHC):</strong> Gắn mô hình cần cẩu tải trọng lên bệ động để thử nghiệm thuật toán thích nghi/MPC.</li>
+                <li><strong>Nâng cấp Firmware:</strong> Giảm chu kỳ lấy mẫu xuống $5\\text{ms}$ giảm sai số xuống $< 1\\%$.</li>
+              </ul>
+            </div>
+
+            <div class="slide-card" style="text-align: center; display: flex; flex-direction: column; justify-content: center; padding: 20px;">
+              <div style="font-size: 2.4rem; color: var(--primary); margin-bottom: 8px;"><i class="fa-solid fa-handshake-angle"></i></div>
+              <h3 style="font-family: var(--font-heading); font-size: 1.4rem; color: #fff; margin-bottom: 8px;">XIN TRÂN TRỌNG CẢM ƠN!</h3>
+              <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">
+                Em xin chân thành cảm ơn Quý Thầy/Cô trong Hội đồng đã chú ý lắng nghe.<br>
+                Em rất mong nhận được những ý kiến đóng góp quý báu!
+              </p>
+            </div>
+          </div>
+        `,
+        speakerNote: "Kết thúc bài thuyết trình đúng giờ (dưới 20 phút), cảm ơn Hội đồng và sẵn sàng bước vào phần trả lời chất vấn phản biện.",
+        script: `Trong giai đoạn tiếp theo, nhóm định hướng tích hợp cảm biến quán tính IMU 9 trục để bù sai số góc thời gian thực, đồng thời thử nghiệm trực tiếp thuật toán bù sóng chủ động cho cần cẩu biển.<br><br>
+        Em xin trân trọng cảm ơn Quý Thầy/Cô trong Hội đồng đã dành thời gian theo dõi bài báo cáo của em. Em xin kính mời Quý Thầy/Cô đưa ra những nhận xét và câu hỏi chất vấn để đề tài được hoàn thiện hơn. Em xin chân thành cảm ơn!`
+      }
+    ];
+
+    /* =========================================================
+       DATA: DEFENSE Q&A SIMULATION BANK (26 COMPREHENSIVE QUESTIONS)
+       ========================================================= */
+    const qaData = [
+      /* --- 1. CLOCK & TIMER & HARDWARE (4 CÂU) --- */
+      {
+        id: 1,
+        category: "clock",
+        catLabel: "Clock & Timer",
+        tagClass: "tag-clock",
+        question: "Trình bày cấu hình Cây xung nhịp (Clock Tree) STM32F446 đạt 180MHz? Tại sao phải kích hoạt Over-Drive Mode và PLLSAI 48MHz?",
+        intent: "Thầy/Cô muốn kiểm tra kiến thức chuyên sâu về vi điều khiển STM32F4, cấu hình PLL, phân tần Bus và nguồn xung ngoại vi.",
+        strategy: "Dẫn chứng chính xác thông số: HSE 12MHz, PLLM=6, PLLN=180, PLLP=2 -> SYSCLK 180MHz; Over-Drive mode ở Scale 1; PLLSAI cấp CLK48 48MHz cho USB FS & SDIO.",
+        answer: `
+          <p><strong>Kính thưa Thầy/Cô, cấu hình Clock Tree của hệ thống được tính toán và thiết lập tối ưu như sau:</strong></p>
+          <ul>
+            <li><strong>Nguồn xung HSE & Main PLL:</strong> Thạch anh ngoài HSE <strong>$12.0\\text{ MHz}$</strong> $\\rightarrow$ $\\text{PLLM} = 6 \\implies f_{VCO\\_in} = 2.0\\text{ MHz}$ $\\rightarrow$ $\\text{PLLN} = 180 \\implies f_{VCO\\_out} = 360.0\\text{ MHz}$ $\\rightarrow$ $\\text{PLLP} = 2 \\implies \\mathbf{f_{SYSCLK} = 180.0\\text{ MHz}}$.</li>
+            <li><strong>Tại sao phải bật Over-Drive Mode:</strong> Để chip STM32F446 chạy ổn định ở tần số cao nhất $180\\text{MHz}$ trong chế độ Voltage Scale 1, bắt buộc phải gọi hàm <code>HAL_PWREx_EnableOverDrive()</code>. Nếu không bật, MCU chỉ chạy tối đa $168\\text{MHz}$.</li>
+            <li><strong>Cấu hình Bus:</strong> AHB = $180\\text{ MHz}$, Flash Latency = 5 WS, APB1 Timer = $90\\text{ MHz}$, APB2 Timer = $180\\text{ MHz}$.</li>
+            <li><strong>Nguồn xung phụ PLLSAI (48MHz):</strong> Ngoại vi USB OTG FS và SDIO đòi hỏi clock chính xác <strong>$48.0\\text{ MHz}$</strong>. Nhóm dùng nhánh <strong>PLLSAI</strong>: $\\text{M}=6, \\text{N}=96, \\text{P}=4 \\implies f_{CLK48} = \\mathbf{48.0\\text{ MHz}}$, đảm bảo USB CDC và thẻ nhớ MicroSD hoạt động ổn định tuyệt đối.</li>
+          </ul>
+        `
+      },
+      {
+        id: 2,
+        category: "clock",
+        catLabel: "Clock & Timer",
+        tagClass: "tag-clock",
+        question: "Cơ chế định thời của TIM1 tạo tần số DDA 200kHz và xung DMA Trigger 400kHz (2.5µs) được thiết lập thế nào trong thanh ghi?",
+        intent: "Kiểm tra kỹ năng lập trình thanh ghi Timer nâng cao (Advanced Timer TIM1), Prescaler, Auto-Reload và Compare Events.",
+        strategy: "Trình bày rõ: Timer clock 180MHz, PSC=89 -> 2MHz, ARR=4 -> 400kHz (chu kỳ 2.5µs). CCR1=1, CCR2=2 kích hoạt DMA UDE/CC1DE/CC2DE.",
+        answer: `
+          <p><strong>Kính thưa Thầy/Cô:</strong></p>
+          <ul>
+            <li><strong>1. Prescaler & Auto-Reload:</strong> Clock đầu vào $180\\text{ MHz}$. Cài đặt <code>TIM1->PSC = 89</code> $\\implies f_{CNT} = \\mathbf{2.0\\text{ MHz}}$ ($0.5\\ \\mu\\text{s/nấc}$). Cài đặt <code>TIM1->ARR = 4</code> $\\implies T_{event} = 5 \\times 0.5\\ \\mu\\text{s} = \\mathbf{2.5\\ \\mu\\text{s}} \\implies f_{event} = \\mathbf{400.0\\text{ kHz}}$.</li>
+            <li><strong>2. Nhịp DDA 200kHz:</strong> Mỗi nhịp DDA $5.0\\ \\mu\\text{s}$ ($200\\text{ kHz}$) gồm 2 sự kiện con $2.5\\ \\mu\\text{s}$: Sự kiện 1 kéo STEP xuống LOW (Active); Sự kiện 2 sau $2.5\\ \\mu\\text{s}$ kéo STEP về HIGH (Idle). Độ rộng xung đạt $2.5\\ \\mu\\text{s} > 1.0\\ \\mu\\text{s}$ của Driver.</li>
+            <li><strong>3. Kích hoạt DMA:</strong> Kích hoạt <code>TIM_DIER_UDE | TIM_DIER_CC1DE | TIM_DIER_CC2DE</code> và <code>TIM_BDTR_MOE</code> để Timer tự kích DMA mà không tốn CPU.</li>
+          </ul>
+        `
+      },
+      {
+        id: 3,
+        category: "clock",
+        catLabel: "Clock & Timer",
+        tagClass: "tag-clock",
+        question: "Tại sao trong hàm main sau khi cấu hình Clock phải gọi lại lệnh hiệu chuẩn SysTick: HAL_SYSTICK_Config(SystemCoreClock / 1000U)?",
+        intent: "Kiểm tra sự hiểu biết về HAL Driver của STMicroelectronics và lỗi ngầm khi đổi nguồn xung nhịp.",
+        strategy: "Giải thích: Ban đầu HAL_Init dùng HSI 16MHz để config SysTick 1ms. Khi switch sang PLL 180MHz, nếu không tính lại thì HAL_Delay() sẽ bị sai thời gian gấp hơn 11 lần.",
+        answer: `
+          <p><strong>Kính thưa Thầy/Cô:</strong></p>
+          <ul>
+            <li>Khi vừa Reset, <code>HAL_Init()</code> cấu hình <code>SysTick</code> $1\\text{ms}$ dựa trên dao động nội <strong>HSI 16MHz</strong>.</li>
+            <li>Sau khi chạy <code>SystemClock_Config()</code> sang <strong>Main PLL 180MHz</strong>, biến <code>SystemCoreClock</code> tăng lên 180,000,000.</li>
+            <li>Nếu không gọi <code>HAL_SYSTICK_Config(SystemCoreClock / 1000U)</code>, ngắt SysTick sẽ xảy ra nhanh gấp <strong>11.25 lần</strong> so với thực tế, khiến <code>HAL_Delay()</code>, Timeout USB và các bộ đếm thời gian hệ thống bị sai lệch hoàn toàn.</li>
+          </ul>
+        `
+      },
+      {
+        id: 4,
+        category: "clock",
+        catLabel: "Clock & Timer",
+        tagClass: "tag-clock",
+        question: "Hệ thống sử dụng các luồng DMA nào trên STM32F446 để đẩy dữ liệu ra thanh ghi GPIO BSRR? Cấu hình Channel và MSIZE/PSIZE ra sao?",
+        intent: "Kiểm tra kiến thức lập trình DMA điều khiển ngoại vi tốc độ cao.",
+        strategy: "Nêu chính xác: DMA2 Stream 5 (Port F), Stream 1 (Port G), Stream 2 (Port C), Channel 6, MSIZE=32bit, PSIZE=32bit, MINC=1, Memory-to-Peripheral.",
+        answer: `
+          <p><strong>Kính thưa Thầy/Cô, cấu hình DMA2 trong <code>DMA_StepInit()</code>:</strong></p>
+          <ul>
+            <li><strong>Ánh xạ luồng:</strong> <code>DMA2_Stream5</code> $\\rightarrow$ <code>GPIOF->BSRR</code>; <code>DMA2_Stream1</code> $\\rightarrow$ <code>GPIOG->BSRR</code>; <code>DMA2_Stream2</code> $\\rightarrow$ <code>GPIOC->BSRR</code>.</li>
+            <li><strong>Cấu hình thanh ghi CR:</strong> Channel 6 (<code>6U << 25</code>, kích hoạt bởi TIM1); MSIZE = PSIZE = <strong>32-bit Word</strong>; Memory Increment (MINC = 1); Direction = Memory-to-Peripheral (<code>1U << 6</code>); Bật ngắt Transfer Complete <code>DMA_SxCR_TCIE</code> trên Stream 5 với NVIC Priority 0.</li>
+          </ul>
+        `
+      },
+
+      /* --- 2. FIRMWARE & DDA PING-PONG (4 CÂU) --- */
+      {
+        id: 5,
+        category: "firmware",
+        catLabel: "Firmware & DDA",
+        tagClass: "tag-firmware",
+        question: "Thuật toán DDA giải quyết bài toán đồng bộ 6 trục như thế nào? Tại sao không dùng bộ tạo xung PWM độc lập?",
+        intent: "Kiểm tra hiểu biết sâu về thuật toán điều khiển chuyển động đa trục trong máy CNC/Robot.",
+        strategy: "Giải thích: PWM thông thường các trục bị lệch pha và không đồng bộ điểm dừng. DDA dùng accumulator phân phối xung đều đặn theo thời gian thực T.",
+        answer: `
+          <p><strong>Kính thưa Thầy/Cô:</strong> DDA dùng khoảng thời gian chạy chung $T = 4000\\text{ ticks} = 20\\text{ms}$. Tốc độ tích lũy: $V_i = \\frac{S_i \\times L_{scale}}{T}$ ($L_{scale} = 65536$). Mỗi nhịp $5\\ \\mu\\text{s}$, $A_i \\leftarrow A_i + V_i$. Khi $A_i \\ge L_{scale}$, bắn 1 xung và $A_i \\leftarrow A_i - L_{scale}$. Sau $T$ nhịp, tổng số xung đúng bằng $S_i$, các trục cùng về đích chính xác ở mili-giây thứ 20.</p>
+        `
+      },
+      {
+        id: 6,
+        category: "firmware",
+        catLabel: "Firmware & DDA",
+        tagClass: "tag-firmware",
+        question: "Cơ chế Bộ đệm kép Ping-Pong (Double Buffering) giải quyết bài toán giới hạn bộ nhớ SRAM và quá tải CPU ra sao?",
+        intent: "Đây là câu hỏi trọng tâm về kiến trúc firmware nhúng nâng cao (DMA + Timer).",
+        strategy: "Dẫn chứng số liệu: Lưu 20ms cần 192KB RAM (vượt 128KB của chip), chia 4 block 5ms chỉ tốn 48KB RAM (37.5%). DMA tự phát xung, CPU Load = 0%.",
+        answer: `
+          <p><strong>Kính thưa Thầy/Cô:</strong></p>
+          <ul>
+            <li><strong>Tối ưu SRAM:</strong> Lưu 20ms (4000 ticks) cần $192\\text{ KB}$ RAM (vượt quá 128KB của chip). Chia 20ms thành <strong>4 block 5ms (1000 ticks)</strong>, RAM chỉ còn $\\mathbf{48\\text{ KB}}$ (chiếm $37.5\\%$ SRAM).</li>
+            <li><strong>Giải phóng CPU:</strong> DMA tự động đọc từ RAM đẩy ra thanh ghi <code>BSRR</code> (CPU Load = 0%). CPU chạy ngầm ở Main Loop tính trước phân đoạn tiếp theo. Khi DMA phát xong, ngắt tráo đổi đệm với <strong>độ trễ 0 ms</strong>.</li>
+          </ul>
+        `
+      },
+      {
+        id: 7,
+        category: "firmware",
+        catLabel: "Firmware & DDA",
+        tagClass: "tag-firmware",
+        question: "Cấu trúc dữ liệu thanh ghi BSRR được tính trước (Pre-compute) như thế nào trong hàm DDA_PreCompute_PP_Chunk?",
+        intent: "Kiểm tra khả năng thao tác bitmask và hiểu rõ cơ chế phần cứng của thanh ghi GPIO BSRR trên STM32.",
+        strategy: "Giải thích: BSRR 32-bit gồm 16 bit thấp (BS - Set High) và 16 bit cao (BR - Reset Low). Hàm tạo mảng bitmask sẵn cho từng tick để DMA chỉ việc nạp thẳng.",
+        answer: `
+          <p><strong>Kính thưa Thầy/Cô:</strong> Thanh ghi <code>GPIOx->BSRR</code> 32-bit: Bit 0..15 gán 1 kéo chân lên HIGH, Bit 16..31 gán 1 kéo chân xuống LOW. Hàm <code>DDA_PreCompute_PP_Chunk</code> tính trước bitmask cho 1000 ticks: <code>buf[tick] = (reset_mask << 16) | set_mask</code>. DMA nạp thẳng giá trị này vào BSRR trong $6\\text{ ns}$, đổi trạng thái cả 6 trục đồng thời.</p>
+        `
+      },
+      {
+        id: 8,
+        category: "firmware",
+        catLabel: "Firmware & DDA",
+        tagClass: "tag-firmware",
+        question: "Trong công thức V_i = (S_i * 65536 + 3999) / 4000, nếu V_i > 65536 thì firmware sẽ xử lý ra sao? Thực tế có xảy ra không?",
+        intent: "Kiểm tra giới hạn bão hòa tần số của thuật toán DDA và biên độ vận tốc cơ học của hệ robot.",
+        strategy: "Giải thích: Vi > 65536 tương đương Si > 4000 bước/20ms (tần số > 200kHz). Thuật toán sẽ bị bão hòa (clamping) ở 1 xung/tick gây thiếu bước. Tuy nhiên thực tế Vi_max chỉ là 35012 (đạt 53.4%), còn dư 46.6% an toàn.",
+        answer: `
+          <p><strong>Kính thưa Thầy/Cô:</strong> $V_i > 65536 \\iff S_i > 4000\\text{ bước/20ms}$ ($f > 200\\text{ kHz}$). Do mỗi tick $5\\ \\mu\\text{s}$ chỉ phát tối đa 1 xung, firmware sẽ bị bão hòa (saturation) ở 4000 bước, phần dư bị thiếu làm méo quỹ đạo. Tuy nhiên, trong đề tài, vận tốc lớn nhất $V_{max} = 10.68\\text{ cm/s}$ tương đương $S_{i,max} = 2137\\text{ bước} \\implies \\mathbf{V_{i,max} = 35012} \\ll 65536$ (chỉ chiếm $53.4\\%$ dải công suất DDA), tuyệt đối an toàn.</p>
+        `
+      },
+
+      /* --- 3. SDCARD FIRMWARE UPDATE & USB HOST (3 CÂU) --- */
+      {
+        id: 9,
+        category: "sdcard",
+        catLabel: "SDCard & USB",
+        tagClass: "tag-sdio",
+        question: "Trình bày kiến trúc và quy trình cập nhật Firmware độc lập qua thẻ nhớ MicroSD (SDIO Bootloader)?",
+        intent: "Kiểm tra kỹ năng xây dựng In-Application Programming (IAP) Bootloader, phân vùng Flash nội và giao tiếp SDIO 4-bit FATFS.",
+        strategy: "Nêu rõ: SDIO 4-bit @ 48MHz (PC8..PC12, PD2, DET PC14); Phân vùng Flash: Sector 0-1 (32KB) Bootloader, Sector 2-7 (480KB) Application 0x08008000; FATFS đọc firmware.bin, flash erase/program, set MSP và SCB->VTOR rồi jump.",
+        answer: `
+          <p><strong>Kính thưa Thầy/Cô, kiến trúc nạp Firmware độc lập qua thẻ SD:</strong></p>
+          <ul>
+            <li><strong>Phần cứng SDIO:</strong> 4-bit bus <code>SDIO_D0..D3</code> (PC8..PC11), <code>SDIO_CK</code> (PC12) @ $48.0\\text{ MHz}$ (từ PLLSAI), <code>SDIO_CMD</code> (PD2), Card Detect <code>DET</code> (PC14).</li>
+            <li><strong>Phân vùng Flash:</strong> Sector 0-1 ($32\\text{ KB}$, <code>0x08000000</code>) chứa <strong>Bootloader</strong>; Sector 2-7 ($480\\text{ KB}$, <code>0x08008000</code>) chứa <strong>Application</strong>.</li>
+            <li><strong>Quy trình:</strong> Khi cắm thẻ SD có file <code>firmware.bin</code> $\\rightarrow$ Bootloader xóa Flash Sector 2-7 $\\rightarrow$ Đọc từng block 512B ghi vào <code>0x08008000</code> $\\rightarrow$ Chuyển bảng vector ngắt <code>SCB->VTOR = 0x08008000</code>, gán <code>__set_MSP()</code> $\\rightarrow$ Nhảy đến Application.</li>
+          </ul>
+        `
+      },
+      {
+        id: 10,
+        category: "sdcard",
+        catLabel: "SDCard & USB",
+        tagClass: "tag-usb",
+        question: "Cơ chế truyền thông dữ liệu hai chiều giữa Host PC (Raspberry Pi) và STM32 diễn ra như thế nào? Cấu trúc gói tin và flow control?",
+        intent: "Kiểm tra kiến thức về USB CDC Virtual COM Port, định dạng khung truyền nhị phân và giao thức bắt tay tránh tràn bộ đệm.",
+        strategy: "Trình bày: USB CDC 12Mbps qua PA11/PA12; Gói lệnh 15 bytes int16_t có CRC8; Cơ chế ACK 'K', NACK 'N', DONE 'D', Emergency 'E', Status 'S'; Độ trễ 0.025ms.",
+        answer: `
+          <p><strong>Kính thưa Thầy/Cô:</strong> Kết nối qua USB CDC Full-Speed 12 Mbps (PA11/PA12). Gói lệnh 15 bytes: <code>[0xAA] ['M'] [12B int16] [CRC8/0x0A]</code>. Cơ chế bắt tay: STM32 nhận lệnh trả <code>'K'</code> (ACK) hoặc <code>'N'</code> (NACK khi đầy); khi phát xong 20ms ngắt DMA bắn <code>'D'</code> (DONE) để Host gửi dòng CSV kế tiếp; lệnh <code>'E'</code> ngắt khẩn cấp; tự động fallback Test Mode sau 10s nếu không có USB.</p>
+        `
+      },
+      {
+        id: 11,
+        category: "sdcard",
+        catLabel: "SDCard & USB",
+        tagClass: "tag-usb",
+        question: "Nếu có sự cố trễ truyền thông USB hoặc mất kết nối làm cạn bộ đệm (Buffer Underflow), firmware bảo vệ hệ thống ra sao?",
+        intent: "Kiểm tra khả năng thiết kế hệ thống nhúng có tính chịu lỗi (Fault-Tolerant) và bảo vệ an toàn cơ cấu.",
+        strategy: "Giải thích: Ngắt DMA kiểm tra pp_buf_ready; nếu underflow lập tức tắt TIM1, kéo các chân STEP lên mức HIGH (Idle) tránh xung lơ lửng làm rung giật motor.",
+        answer: `
+          <p><strong>Kính thưa Thầy/Cô:</strong> Khi ngắt DMA hoàn thành 5ms, firmware kiểm tra <code>pp_buf_ready[next_buf]</code>. Nếu bộ đệm chưa sẵn sàng (Underflow), firmware lập tức tắt Timer 1 (<code>TIM1->CR1 &= ~TIM_CR1_CEN</code>) và ép toàn bộ các chân STEP về mức <strong>HIGH (Idle)</strong>, ngăn DMA ghi dữ liệu rác, triệt tiêu hoàn toàn hiện tượng rung giật động cơ.</p>
+        `
+      },
+
+      /* --- 4. CHU TRÌNH HỆ THỐNG & TÌNH HUỐNG HOMING (3 CÂU) --- */
+      {
+        id: 12,
+        category: "cycle",
+        catLabel: "Chu Trình & Homing",
+        tagClass: "tag-cycle",
+        question: "Trình bày toàn bộ Chu trình hoạt động hệ thống (System Cycle) từ khi khởi động đến khi kết thúc phát chuyển động?",
+        intent: "Kiểm tra bức tranh tổng thể về kiến trúc hệ thống và sự phối hợp giữa Host PC và Vi điều khiển.",
+        strategy: "Tóm tắt 5 pha: 1. Init phần cứng; 2. Nhận lệnh 'H' chạy Homing 5 bước; 3. Host đọc CSV và giải động học IK; 4. Vòng lặp nhận lệnh USB & phát xung Ping-Pong DMA 5ms; 5. Kết thúc chuyển về IDLE.",
+        answer: `
+          <p><strong>Kính thưa Thầy/Cô, chu trình gồm 5 giai đoạn:</strong> 1. Khởi tạo phần cứng (180MHz, TIM1, DMA, USB CDC); 2. Homing 6 trục khi nhận lệnh <code>'H'</code>; 3. Host giải IK tạo dữ liệu CSV 20ms; 4. Vòng lặp nhận lệnh USB, CPU pre-compute 5ms, DMA phát xung BSRR, gửi <code>'D'</code> hoàn thành; 5. Kết thúc về IDLE an toàn.</p>
+        `
+      },
+      {
+        id: 13,
+        category: "cycle",
+        catLabel: "Chu Trình & Homing",
+        tagClass: "tag-homing",
+        question: "Trong quy trình Homing, các tình huống: trục chạm trước chạm sau, đứt dây cảm biến, hoặc sai số quán tính cơ học được giải quyết thế nào?",
+        intent: "Kiểm tra kỹ năng xử lý các tình huống biên (Edge Cases) trong bài toán định vị gốc tọa độ robot thực tế.",
+        strategy: "Nêu 3 giải pháp: Dừng độc lập từng trục khi chạm STOP_i; Dò 2 lần (thô + lùi 100 bước + tinh 1/10) khử quán tính; Timer Watchdog Timeout 15s chống kẹt cơ.",
+        answer: `
+          <p><strong>Kính thưa Thầy/Cô:</strong> 1. Trục chạm trước sẽ dừng độc lập ngay lập tức, các trục khác tiếp tục chạy (chống xoắn gãy thanh nối); 2. Dò thô xong lùi 100 bước rồi dò tinh lần 2 ở tốc độ 1/10 để triệt tiêu trớn quán tính, đạt độ chính xác $\\pm 1\\ \\mu\\text{m}$; 3. Kích hoạt Timeout 15s: nếu quá 15s chưa chạm cảm biến $\\rightarrow$ ngắt khẩn cấp báo lỗi chống kẹt cơ.</p>
+        `
+      },
+      {
+        id: 14,
+        category: "cycle",
+        catLabel: "Chu Trình & Homing",
+        tagClass: "tag-homing",
+        question: "Làm thế nào để duy trì tính liên tục của bộ tích lũy DDA và state_timer giữa các phân đoạn 5ms của bộ đệm kép Ping-Pong?",
+        intent: "Kiểm tra sự thấu hiểu về việc nối tiếp pha chuyển động (Phase Continuity) giữa các block bộ đệm.",
+        strategy: "Giải thích: Biến accum và state_timer của struct AxisConfig_t là biến toàn cục lưu trạng thái, không bị reset khi chuyển buffer chunk.",
+        answer: `
+          <p><strong>Kính thưa Thầy/Cô:</strong> Các biến trạng thái <code>accum</code>, <code>state_timer</code>, <code>steps_done</code> trong <code>AxisConfig_t</code> được duy trì liên tục xuyên suốt qua các phân đoạn 5ms, giá trị dư của <code>accum</code> ở tick 999 của Buffer 0 sẽ là giá trị khởi đầu cho tick 0 của Buffer 1, triệt tiêu hiện tượng méo xung ở biên giới phân đoạn.</p>
+        `
+      },
+
+      /* --- 5. MECHANICAL & KINEMATICS (4 CÂU) --- */
+      {
+        id: 15,
+        category: "mech",
+        catLabel: "Cơ Khí & Động Học",
+        tagClass: "tag-mech",
+        question: "Tại sao nhóm lại lựa chọn cơ cấu Stewart 6-PUS (vít me tịnh tiến đứng) thay vì cơ cấu dạng xoay 6-RSS hay cơ cấu 6-UPS?",
+        intent: "Thầy/Cô muốn kiểm tra tư duy chọn phương án và khả năng phân tích định lượng cơ học.",
+        strategy: "Dẫn chứng ngay số liệu momen Matlab: Hệ xoay cần 95.46 N.mm (gấp 25.4 lần) so với 3.76 N.mm của vít me, và ma trận quyết định đạt 67/72 điểm.",
+        answer: `
+          <p><strong>Kính thưa Thầy/Cô:</strong> Momen tải hệ xoay lên tới $95.457\\text{ N.mm}$ do cánh tay đòn lực, trong khi cơ cấu vít me 6-PUS chỉ yêu cầu $3.760\\text{ N.mm}$ (nhỏ hơn 25.4 lần). Cơ cấu 6-PUS gắn cố định động cơ trên đế giúp giảm quán tính chuyển động, ma trận đánh giá đạt 67/72 điểm chọn 6-PUS.</p>
+        `
+      },
+      {
+        id: 16,
+        category: "mech",
+        catLabel: "Cơ Khí & Động Học",
+        tagClass: "tag-mech",
+        question: "Phương pháp tính chọn trục vít me SFU1204 bước 4mm và cơ sở kiểm tra tải oằn Euler, vận tốc nguy hiểm ra sao?",
+        intent: "Kiểm tra kiến thức tính toán chi tiết máy và khả năng tra cứu tiêu chuẩn (THK / JIS).",
+        strategy: "Trình bày công thức tính bước ren p >= 2.14mm, lực dọc trục Fa=66.24N, tải oằn P1=12863N, vận tốc nguy hiểm N1=24942 RPM.",
+        answer: `
+          <p><strong>Kính thưa Thầy/Cô:</strong> Vận tốc $10.7\\text{ cm/s}$ $\\rightarrow$ Bước ren $P_h = 4\\text{ mm}$, $D = 12\\text{ mm}$ (SFU1204 C7), tốc độ quay $1605\\text{ RPM}$. Tải oằn Euler $P_1 = 12863\\text{ N} \\gg 66.24\\text{ N}$ (An toàn gấp 194 lần). Vận tốc nguy hiểm $N_1 = 24942\\text{ RPM} \\gg 1605\\text{ RPM}$, tuổi thọ $3.55 \\times 10^6\\text{ giờ}$.</p>
+        `
+      },
+      {
+        id: 17,
+        category: "mech",
+        catLabel: "Cơ Khí & Động Học",
+        tagClass: "tag-mech",
+        question: "Làm thế nào để phân tích và tránh các điểm kỳ dị (Singularity) của robot Stewart 6-PUS? Ý nghĩa của ma trận chuẩn hóa Wscale?",
+        intent: "Kiểm tra kiến thức động học nâng cao, ma trận Jacobian và chỉ số điều kiện.",
+        strategy: "Nêu rõ 2 loại kỳ dị (det(Jd)=0 khi Δi=0 và det(Jx)=0), ma trận Wscale để đồng nhất đơn vị mm và rad, và chỉ số điều kiện kappa <= 50.",
+        answer: `
+          <p><strong>Kính thưa Thầy/Cô:</strong> Khống chế góc khớp $\\theta_i \\le 45^\\circ \\implies \\Delta_i \\ge 162.6\\text{mm} > 0$ triệt tiêu kỳ dị loại I (det(Jd)=0); kiểm tra $|\\det(J_x)| \\ge 10^{-2}$ tránh kỳ dị loại II. Chuẩn hóa ma trận qua $W_{scale} = \\text{diag}(1,1,1, 1/R_p, 1/R_p, 1/R_p)$ cho chỉ số điều kiện $\\kappa \\approx 5.2 \\dots 5.6 \\le 50.0$ đạt độ đẳng hướng cao.</p>
+        `
+      },
+      {
+        id: 18,
+        category: "mech",
+        catLabel: "Cơ Khí & Động Học",
+        tagClass: "tag-mech",
+        question: "Làm thế nào để xử lý dung sai chế tạo và tránh hiện tượng quá định vị (Over-constraint) gây kẹt cơ cấu khi lắp 6 trục?",
+        intent: "Kiểm tra kiến thức thực tế về gia công cơ khí chính xác và dung sai lắp ghép.",
+        strategy: "Giải trình việc dùng H7/k6 định vị gối đỡ và H7/h6 cho bạc trượt dẫn hướng, khớp Cardan để bù trừ sai lệch gia công.",
+        answer: `
+          <p><strong>Kính thưa Thầy/Cô:</strong> Lỗ gá mặt bích động cơ dùng $\\varnothing 38.1\\text{ H7}$ đảm bảo độ đồng tâm $\\le 0.05\\text{mm}$; trục dẫn hướng lắp chặt $\\varnothing 10\\text{ H7/k6}$; bạc trượt và ngỗng khớp Cardan dùng mối ghép lỏng nhẹ $\\varnothing 19\\text{ H7/h6}$ và $\\varnothing 12\\text{ H7/h6}$ khử rơ nhưng tránh quá định vị gây kẹt đai ốc.</p>
+        `
+      },
+
+      /* --- 6. ELECTRONICS, POWER & SAFETY (4 CÂU) --- */
+      {
+        id: 19,
+        category: "elec",
+        catLabel: "Điện Tử & An Toàn",
+        tagClass: "tag-elec",
+        question: "Tại sao nhóm lại sử dụng IC SN75174N làm bộ đệm vi sai RS-422 thay vì nối trực tiếp xung 3.3V từ STM32 đến Driver?",
+        intent: "Kiểm tra kiến thức thiết kế phần cứng chống nhiễu trong môi trường công nghiệp.",
+        strategy: "Nêu rõ mức điện áp Driver yêu cầu >=4V, nhiễu EMI từ 6 cuộn dây động cơ, và ưu điểm khử nhiễu đồng pha của RS-422.",
+        answer: `
+          <p><strong>Kính thưa Thầy/Cô:</strong> Driver SSDC06 yêu cầu điện áp quang $\\ge 4.0\\text{V}$ (STM32 chỉ 3.3V dễ mất xung). Chuẩn vi sai RS-422 dùng cặp tín hiệu đảo pha (STEP+/STEP-) giúp triệt tiêu hoàn toàn nhiễu đồng pha (EMI) sinh ra từ 6 cuộn dây động cơ công suất lớn.</p>
+        `
+      },
+      {
+        id: 20,
+        category: "elec",
+        catLabel: "Điện Tử & An Toàn",
+        tagClass: "tag-elec",
+        question: "Trình bày nguyên lý hoạt động của mạch Dừng khẩn cấp (E-Stop) bảo vệ kép và thời gian đáp ứng?",
+        intent: "Kiểm tra tiêu chuẩn an toàn thiết bị cơ điện tử và xử lý ngắt MCU.",
+        strategy: "Tách bạch 2 lớp: Rơ-le an toàn PNOZ X2.8P ngắt nguồn 24V cơ khí <30ms; Ngắt ngoài EXTI PC5 ngắt Timer/DMA <1µs.",
+        answer: `
+          <p><strong>Kính thưa Thầy/Cô:</strong> Lớp 1 (Phần cứng): Nút E-Stop ngắt cuộn dây Rơ-le an toàn PNOZ, cắt trực tiếp nguồn 24V cấp 6 Driver trong $T_{cut} < 30\\text{ms}$. Lớp 2 (Phần mềm): Tín hiệu vào chân ngắt ngoài <code>KILL (PC5 EXTI)</code> trong $<1\\ \\mu\\text{s}$ lập tức dừng Timer 1, hủy DMA và tắt chân Enable.</p>
+        `
+      },
+      {
+        id: 21,
+        category: "elec",
+        catLabel: "Điện Tử & An Toàn",
+        tagClass: "tag-elec",
+        question: "Cơ sở tính chọn nguồn chính 24VDC 600W và thiết kế mạch hạ áp Buck SY8368A (5V) & LDO RT9193 (3.3V)?",
+        intent: "Kiểm tra khả năng tính toán cân bằng công suất và thiết kế mạch nguồn xung.",
+        strategy: "Nêu tổng công suất 490.32W x 1.2 = 588.38W chọn nguồn Omron 600W 27A; Tính toán điện trở R2=13.7k, L=1.5µH, Cout=66µF cho SY8368A.",
+        answer: `
+          <p><strong>Kính thưa Thầy/Cô:</strong> Tổng công suất $P = 490.32\\text{W} \\times 1.2 = \\mathbf{588.38\\text{ W}}$ $\\rightarrow$ Chọn nguồn <strong>Omron 24V-27A 600W</strong>. Mạch Buck SY8368A (8A, $800\\text{kHz}$, $L=1.5\\mu\\text{H}$, $C_{OUT}=66\\mu\\text{F}$) hạ từ 24V xuống $4.978\\text{V}$; LDO RT9193 hạ tiếp xuống 3.3V cấp riêng cho STM32.</p>
+        `
+      },
+      {
+        id: 22,
+        category: "elec",
+        catLabel: "Điện Tử & An Toàn",
+        tagClass: "tag-elec",
+        question: "Mạch giao tiếp cảm biến tiệm cận quang điện từ với vi điều khiển được tính toán như thế nào để đảm bảo độ bền?",
+        intent: "Kiểm tra việc tính toán điện trở hạn dòng và dòng kích mở CTR của Optocoupler PC817.",
+        strategy: "Trình bày công thức tính R=4.7kΩ cho dòng IF=4.85mA, và điện trở kéo lên 10k cho IC=0.31mA nhỏ hơn IC(min)=2.5mA.",
+        answer: `
+          <p><strong>Kính thưa Thầy/Cô:</strong> Dùng Opto PC817 cách ly 24V về 3.3V. Điện trở hạn dòng $R = \\frac{24 - 1.4}{5\\text{mA}} = 4.52\\text{k}\\Omega \\implies \\text{Chọn } \\mathbf{4.7\\text{ k}\\Omega}$. Điện trở kéo lên $10\\text{k}\\Omega$ cho $I_C = 0.31\\text{mA} \\ll I_{C(min)} = 2.42\\text{mA}$, transistor dẫn bão hòa dứt khoát.</p>
+        `
+      },
+
+      /* --- 7. SIMULATION & ERROR ANALYSIS (4 CÂU) --- */
+      {
+        id: 23,
+        category: "sim",
+        catLabel: "Mô Phỏng & Sai Số",
+        tagClass: "tag-sim",
+        question: "Tại sao trong kết quả đo Logic Analyzer, chân M1 và M4 lại bị lệch 8 xung so với giá trị mong muốn?",
+        intent: "Thầy/Cô muốn kiểm tra tính trung thực khoa học và khả năng phân tích lỗi vi mô của nhóm.",
+        strategy: "Thẳng thắn thừa nhận và giải thích nguyên nhân: Do phép chia trần làm tròn số nguyên khi chia 1 lệnh 20ms thành 4 phân đoạn 5ms DDA.",
+        answer: `
+          <p><strong>Kính thưa Thầy/Cô:</strong> Trong 4 giây ($251.150\\text{ xung}$), M1 & M4 lệch đúng 8 xung ($0.0031\\%$) do hàm chia trần $\\text{ceil}()$ khi chia 20ms thành 4 block 5ms DDA. 8 xung này tương đương độ lệch chỉ là $\\mathbf{0.008\\text{ mm}}$ ($8\\ \\mu\\text{m}$), hoàn toàn nằm trong dung sai cho phép $\\pm 0.5\\text{mm}$.</p>
+        `
+      },
+      {
+        id: 24,
+        category: "sim",
+        catLabel: "Mô Phỏng & Sai Số",
+        tagClass: "tag-sim",
+        question: "Nguyên nhân cốt lõi gây ra sai số chuyển động ~3.4% trong mô phỏng RecurDyn là gì? Hướng khắc phục ra sao?",
+        intent: "Kiểm tra khả năng đánh giá kết quả mô phỏng và định hướng tối ưu hóa hệ thống.",
+        strategy: "Nêu 2 nguyên nhân: Rời rạc hóa chu kỳ lấy mẫu 0.02s dạng bậc thang step-like; Hướng khắc phục: Giảm sample time xuống 5ms hoặc nội suy spline bậc 3.",
+        answer: `
+          <p><strong>Kính thưa Thầy/Cô:</strong> Sai số $\\approx 3.4\\%$ do việc lấy mẫu rời rạc $0.02\\text{s}$ làm quỹ đạo có dạng bậc thang vi phân và độ lệch 8 xung MCU. Khắc phục bằng cách giảm chu kỳ lấy mẫu xuống $5\\text{ms}$ và áp dụng nội suy Spline bậc 3 làm mịn quỹ đạo.</p>
+        `
+      },
+      {
+        id: 25,
+        category: "sim",
+        catLabel: "Mô Phỏng & Sai Số",
+        tagClass: "tag-sim",
+        question: "Hệ thống này có thể ứng dụng trực tiếp để thử nghiệm công nghệ bù sóng (Active Heave Compensation - AHC) ngoài thực tế như thế nào?",
+        intent: "Đánh giá tầm nhìn ứng dụng thực tiễn của đề tài trong công nghiệp dầu khí/hàng hải.",
+        strategy: "Trình bày kịch bản thử nghiệm HIL: Đặt mô hình cần cẩu tải trọng lên bệ Stewart, bệ tạo sóng, cần cẩu chạy thuật toán bù sóng giữ yên vị trí tải.",
+        answer: `
+          <p><strong>Kính thưa Thầy/Cô:</strong> Bệ Stewart đóng vai trò sàn tàu tạo sóng 6-DOF. Đặt mô hình cần cẩu tời cáp lên bệ động, cần cẩu chạy thuật toán AHC chủ động điều khiển giữ yên tải trọng trong không gian để kiểm chứng thuật toán HIL trước khi lắp lên tàu thật.</p>
+        `
+      },
+      {
+        id: 26,
+        category: "mech",
+        catLabel: "Cơ Khí & Động Học",
+        tagClass: "tag-mech",
+        question: "Kiểm bền FEA cho thấy hệ số an toàn nhỏ nhất lên tới SF = 50, liệu thiết kế có bị quá dư thừa vật liệu và làm nặng cơ cấu không?",
+        intent: "Kiểm tra tư duy tối ưu hóa kết cấu cơ khí và lý do kỹ thuật đằng sau hệ số an toàn lớn.",
+        strategy: "Giải thích: Hệ thống thiết kế cho tải 30kg nhưng quan trọng nhất là độ cứng vững khử biến dạng đàn hồi (độ võng <0.004mm) chứ không chỉ riêng độ bền phá hủy.",
+        answer: `
+          <p><strong>Kính thưa Thầy/Cô:</strong> Trong robot song song chính xác, tiêu chí hàng đầu là <strong>Độ cứng vững chống biến dạng đàn hồi</strong>. Với $\\text{SF}=50$, chuyển vị lớn nhất chỉ $0.004\\text{ mm}$ ($4\\ \\mu\\text{m}$) bảo toàn độ chính xác động học. Toàn bộ chi tiết làm bằng hợp kim nhôm nên trọng lượng vẫn rất nhẹ.</p>
+        `
+      }
+    ];
+
+    /* =========================================================
+       APP STATE & CONTROLLER (WITH IPHONE TOUCH SWIPE GESTURES)
+       ========================================================= */
+    let currentSlideIndex = 0;
+    let timerInterval = null;
+    let timerSeconds = 20 * 60;
+    let isTimerRunning = false;
+
+    // Touch gesture tracking for iPhone
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchEndX = 0;
+    let touchEndY = 0;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderSlide(0);
+      renderAllScriptCards();
+      renderAllQACards();
+      renderSlideThumbnails();
+      setupKeyboardShortcuts();
+      setupTouchGestures();
+    });
+
+    /* Touch Gestures Setup for iPhone Swipe */
+    function setupTouchGestures() {
+      const slideViewport = document.getElementById('slideViewport');
+
+      slideViewport.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+        touchStartY = e.changedTouches[0].screenY;
+      }, { passive: true });
+
+      slideViewport.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        touchEndY = e.changedTouches[0].screenY;
+        handleSwipeGesture();
+      }, { passive: true });
+    }
+
+    function handleSwipeGesture() {
+      const deltaX = touchEndX - touchStartX;
+      const deltaY = touchEndY - touchStartY;
+      
+      // Chỉ kích hoạt chuyển slide khi vuốt ngang rõ rệt (deltaX > 45px và góc nghiêng ngang lớn hơn dọc)
+      if (Math.abs(deltaX) > 45 && Math.abs(deltaX) > Math.abs(deltaY) * 1.3) {
+        if (deltaX < 0) {
+          // Vuốt sang trái -> Slide tiếp theo
+          nextSlide();
+        } else {
+          // Vuốt sang phải -> Slide trước đó
+          prevSlide();
+        }
+      }
+    }
+
+    /* Switch Main Nav Tabs */
+    function switchView(viewId) {
+      document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-tab-btn').forEach(b => b.classList.remove('active'));
+      
+      const targetPanel = document.getElementById(viewId);
+      if (targetPanel) targetPanel.classList.add('active');
+      
+      const tabBtns = document.querySelectorAll('.nav-tab-btn');
+      if (viewId === 'slide-view') tabBtns[0].classList.add('active');
+      else if (viewId === 'script-view') tabBtns[1].classList.add('active');
+      else if (viewId === 'qa-view') tabBtns[2].classList.add('active');
+      else if (viewId === 'cheatsheet-view') tabBtns[3].classList.add('active');
+
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise();
+      }
+    }
+
+    /* Render Single Slide */
+    function renderSlide(index) {
+      if (index < 0) index = 0;
+      if (index >= slidesData.length) index = slidesData.length - 1;
+      currentSlideIndex = index;
+
+      const slide = slidesData[index];
+      const container = document.getElementById('slideContainer');
+
+      container.innerHTML = `
+        <div class="slide-header-bar">
+          <div>
+            <div class="slide-category-tag"><i class="fa-solid fa-cube"></i> ${slide.category}</div>
+            <div class="slide-title">${slide.title}</div>
+          </div>
+          <div class="slide-badge-num">SLIDE ${slide.id} / 30</div>
+        </div>
+        <div class="slide-body">
+          ${slide.body}
+        </div>
+      `;
+
+      // Update progress bar
+      const progressPercent = ((index + 1) / slidesData.length) * 100;
+      document.getElementById('slideProgressFill').style.width = progressPercent + '%';
+      document.getElementById('slideCounterLabel').innerText = `${index + 1} / ${slidesData.length}`;
+
+      // Update Speaker Note
+      document.getElementById('quickSpeakerNote').innerHTML = `
+        <strong>[Slide ${slide.id} - ${slide.title}]:</strong> ${slide.speakerNote}
+      `;
+
+      // Re-trigger MathJax rendering
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([container, document.getElementById('quickSpeakerNote')]);
+      }
+
+      // Highlight active thumbnail in grid
+      document.querySelectorAll('.slide-thumb-card').forEach((card, idx) => {
+        if (idx === index) card.classList.add('active');
+        else card.classList.remove('active');
+      });
+    }
+
+    function nextSlide() {
+      if (currentSlideIndex < slidesData.length - 1) {
+        renderSlide(currentSlideIndex + 1);
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlideIndex > 0) {
+        renderSlide(currentSlideIndex - 1);
+      }
+    }
+
+    function handleProgressBarClick(e) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const percent = clickX / rect.width;
+      const targetIndex = Math.floor(percent * slidesData.length);
+      renderSlide(targetIndex);
+    }
+
+    /* Render All Script Cards */
+    function renderAllScriptCards() {
+      const container = document.getElementById('scriptContainer');
+      let html = '';
+
+      slidesData.forEach((s, idx) => {
+        const estMinutes = Math.round((idx + 1) * 0.65 * 10) / 10;
+        html += `
+          <div class="script-card-item" id="script-card-${idx}">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <div class="script-slide-badge">
+                <i class="fa-solid fa-file-powerpoint"></i> SLIDE ${s.id}: ${s.title}
+              </div>
+              <span class="script-timing-tag" style="background: rgba(245, 158, 11, 0.15); color: var(--warning); font-family: var(--font-code); font-size: 0.75rem; padding: 2px 6px; border-radius: 4px;"><i class="fa-solid fa-clock"></i> ~${estMinutes} phút</span>
+            </div>
+
+            <div class="script-speech-content">
+              ${s.script}
+            </div>
+
+            <div class="defense-key-points">
+              <div class="defense-point-card">
+                <strong>🎯 Điểm cốt lõi cần nhấn mạnh:</strong>
+                ${s.speakerNote}
+              </div>
+              <div class="defense-point-card">
+                <strong>💡 Câu chuyển tiếp (Transition):</strong>
+                "Sau đây em xin kính mời Quý Thầy/Cô cùng chuyển sang nội dung tiếp theo..."
+              </div>
+            </div>
+
+            <div style="margin-top: 10px; display: flex; gap: 8px;">
+              <button class="slide-ctrl-btn" style="padding: 4px 10px; font-size: 0.75rem; min-height: 32px;" onclick="jumpToSlideFromScript(${idx})">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> Xem Slide này
+              </button>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function jumpToSlideFromScript(index) {
+      renderSlide(index);
+      switchView('slide-view');
+    }
+
+    function filterScriptCurrent() {
+      const card = document.getElementById(`script-card-${currentSlideIndex}`);
+      if (card) {
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        document.querySelectorAll('.script-card-item').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+      }
+    }
+
+    let isAutoScrolling = false;
+    let scrollInterval = null;
+    function startPrompterMode() {
+      if (!isAutoScrolling) {
+        isAutoScrolling = true;
+        scrollInterval = setInterval(() => {
+          window.scrollBy({ top: 1, behavior: 'smooth' });
+        }, 40);
+      } else {
+        isAutoScrolling = false;
+        clearInterval(scrollInterval);
+      }
+    }
+
+    /* Render QA Defense Cards */
+    function renderAllQACards() {
+      const container = document.getElementById('qaContainer');
+      let html = '';
+
+      qaData.forEach(item => {
+        html += `
+          <div class="qa-card" data-cat="${item.category}" id="qa-card-${item.id}">
+            <div class="qa-card-header" onclick="toggleQACard(${item.id})">
+              <div class="qa-question-box">
+                <span class="qa-committee-tag ${item.tagClass}"><i class="fa-solid fa-user-tie"></i> ${item.catLabel}</span>
+                <div class="qa-question-text">Câu ${item.id}: ${item.question}</div>
+                <div class="qa-intent-text"><i class="fa-solid fa-lightbulb"></i> Ý đồ: ${item.intent}</div>
+              </div>
+              <div class="qa-expand-icon"><i class="fa-solid fa-chevron-down"></i></div>
+            </div>
+
+            <div class="qa-card-body">
+              <div class="qa-strategy-box">
+                <strong><i class="fa-solid fa-chess-knight"></i> Chiến thuật:</strong> ${item.strategy}
+              </div>
+              <div class="qa-answer-text">
+                ${item.answer}
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([container]);
+      }
+    }
+
+    function toggleQACard(id) {
+      const card = document.getElementById(`qa-card-${id}`);
+      card.classList.toggle('open');
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise([card]);
+      }
+    }
+
+    function toggleAllQA() {
+      const cards = document.querySelectorAll('.qa-card');
+      const shouldOpen = !cards[0].classList.contains('open');
+      cards.forEach(c => {
+        if (shouldOpen) c.classList.add('open');
+        else c.classList.remove('open');
+      });
+      if (window.MathJax && MathJax.typesetPromise) {
+        MathJax.typesetPromise();
+      }
+    }
+
+    function filterQACategory(cat, chipElem) {
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      chipElem.classList.add('active');
+
+      document.querySelectorAll('.qa-card').forEach(card => {
+        if (cat === 'all' || card.getAttribute('data-cat') === cat) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    function filterQA() {
+      const query = document.getElementById('qaSearchInput').value.toLowerCase().trim();
+      document.querySelectorAll('.qa-card').forEach(card => {
+        const text = card.innerText.toLowerCase();
+        if (text.includes(query)) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    /* Render Slide Thumbnails for Grid Modal */
+    function renderSlideThumbnails() {
+      const grid = document.getElementById('slideThumbGrid');
+      let html = '';
+
+      slidesData.forEach((s, idx) => {
+        html += `
+          <div class="slide-thumb-card ${idx === 0 ? 'active' : ''}" onclick="selectSlideFromGrid(${idx})">
+            <div class="slide-thumb-num" style="font-family: var(--font-code); font-size: 0.75rem; color: var(--primary); font-weight: bold;">SLIDE ${s.id}</div>
+            <div class="slide-thumb-title" style="font-size: 0.8rem; font-weight: 600; color: var(--text-main); margin-top: 3px; line-height: 1.2;">${s.title}</div>
+          </div>
+        `;
+      });
+
+      grid.innerHTML = html;
+    }
+
+    function openSlideGrid() {
+      document.getElementById('slideGridModal').classList.add('open');
+    }
+
+    function closeSlideGrid(e) {
+      document.getElementById('slideGridModal').classList.remove('open');
+    }
+
+    function selectSlideFromGrid(index) {
+      renderSlide(index);
+      closeSlideGrid();
+      switchView('slide-view');
+    }
+
+    /* Keyboard Shortcuts Navigation (Desktop / iPad Magic Keyboard) */
+    function setupKeyboardShortcuts() {
+      window.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+          e.preventDefault();
+          nextSlide();
+        } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+          e.preventDefault();
+          prevSlide();
+        } else if (e.key === 'Home') {
+          e.preventDefault();
+          renderSlide(0);
+        } else if (e.key === 'End') {
+          e.preventDefault();
+          renderSlide(slidesData.length - 1);
+        } else if (e.key.toLowerCase() === 'f') {
+          e.preventDefault();
+          toggleFullScreen();
+        } else if (e.key.toLowerCase() === 'o') {
+          e.preventDefault();
+          openSlideGrid();
+        } else if (e.key.toLowerCase() === 'n') {
+          e.preventDefault();
+          switchView('script-view');
+          filterScriptCurrent();
+        } else if (e.key === 'Escape') {
+          closeSlideGrid();
+        }
+      });
+    }
+
+    /* Fullscreen Toggle */
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => console.log(err.message));
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    /* Theme Toggle */
+    function toggleTheme() {
+      const current = document.body.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.body.setAttribute('data-theme', next);
+      const icon = document.getElementById('themeIcon');
+      if (next === 'light') {
+        icon.className = 'fa-solid fa-sun';
+      } else {
+        icon.className = 'fa-solid fa-moon-stars';
+      }
+    }
+
+    /* Defense 20-Min Timer Logic */
+    function updateTimerDisplay() {
+      const minutes = Math.floor(timerSeconds / 60);
+      const seconds = timerSeconds % 60;
+      const displayStr = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      const elem = document.getElementById('defenseTimer');
+      elem.innerText = displayStr;
+
+      if (timerSeconds <= 180 && timerSeconds > 0) {
+        elem.style.color = 'var(--warning)';
+      } else if (timerSeconds <= 0) {
+        elem.style.color = 'var(--danger)';
+      } else {
+        elem.style.color = 'var(--primary)';
+      }
+    }
+
+    function toggleTimer() {
+      const btn = document.getElementById('timerToggleBtn');
+      if (!isTimerRunning) {
+        isTimerRunning = true;
+        btn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+        timerInterval = setInterval(() => {
+          if (timerSeconds > 0) {
+            timerSeconds--;
+            updateTimerDisplay();
+          } else {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            btn.innerHTML = '<i class="fa-solid fa-play"></i>';
+          }
+        }, 1000);
+      } else {
+        isTimerRunning = false;
+        clearInterval(timerInterval);
+        btn.innerHTML = '<i class="fa-solid fa-play"></i>';
+      }
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      isTimerRunning = false;
+      timerSeconds = 20 * 60;
+      document.getElementById('timerToggleBtn').innerHTML = '<i class="fa-solid fa-play"></i>';
+      updateTimerDisplay();
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Sơ đồ khối tổng thể Cơ - Điện - Điều khiển</title>
+    <style>
+        @page {
+            size: A3 landscape;
+            margin: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 15mm;
+            width: 420mm;
+            height: 297mm;
+            box-sizing: border-box;
+            background-color: #ffffff;
+            color: #333333;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 8mm;
+        }
+        header h1 {
+            font-size: 24pt;
+            margin: 0;
+            color: #1a365d;
+            letter-spacing: 1px;
+        }
+        header p {
+            font-size: 12pt;
+            margin: 5px 0 0 0;
+            color: #4a5568;
+            font-style: italic;
+        }
+        .container {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: calc(100% - 35mm);
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            background-color: #f8fafc;
+            padding: 5mm;
+            box-sizing: border-box;
+        }
+        .mermaid {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 10pt;
+            color: #64748b;
+            margin-top: 8mm;
+            border-top: 1px solid #cbd5e1;
+            padding-top: 4mm;
+        }
+    </style>
+    <!-- load mermaid from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true
+            }
+        });
+    </script>
+</head>
+<body>
+    <header>
+        <h1>SƠ ĐỒ KHỐI TỔNG THỂ CƠ - ĐIỆN - ĐIỀU KHIỂN</h1>
+        <p>Hệ thống mô phỏng chuyển động xà lan trên biển bằng cơ cấu Stewart Platform 6 DOF</p>
+    </header>
+    <div class="container">
+        <div class="mermaid">
+graph TB
+    %% Định nghĩa các Subgraph
+    subgraph Control["PHẦN ĐIỀU KHIỂN (CONTROL)"]
+        Host["Máy tính nhúng Host (Raspberry Pi / PC)<br>- Nội suy quỹ đạo xà lan chịu sóng biển<br>- Truyền gói lệnh di chuyển 20ms qua USB"]
+        
+        subgraph MCU["Bộ điều khiển vi xử lý (STM32F446ZE)"]
+            Parser["USB CDC Parser & cmd_queue"]
+            DDA["DDA Engine<br>(Thuật toán đồng bộ 6 trục)"]
+            DMA_TIM["Đồng bộ DMA & Timer 1<br>(Tần số 200kHz)"]
+            Homing["Logic Homing & An toàn"]
+        end
+        
+        Host -- "Gửi lệnh (M, H, E)" --> Parser
+        Parser -- "Đọc & Xếp hàng lệnh" --> DDA
+        DDA -- "Tính trước 5ms (BSRR)" --> DMA_TIM
+        Homing -- "Ngắt khẩn cấp" --> DMA_TIM
+    end
+
+    subgraph Elec["PHẦN ĐIỆN - ĐIỆN TỬ (ELECTRICAL)"]
+        PSU["Hệ thống quản lý nguồn (PSU)<br>- Hạ áp & phân phối nguồn: 3.3V, 5V, 12V/24V<br>- Tín hiệu điều khiển PS_ON & PWR_DET"]
+        
+        Drivers["Khối lái động cơ (6x Stepper Drivers)<br>- Module TMC2209 / A4988<br>- Giao tiếp cấu hình SPI"]
+        
+        Sensors["Mạch cảm biến & An toàn<br>- 8x Cảm biến hành trình (End-stops)<br>- Cảm biến cân bàn BLTouch<br>- Nút dừng khẩn cấp cơ học (KILL)"]
+    end
+
+    subgraph Mech["PHẦN CƠ KHÍ (MECHANICAL)"]
+        Motors["Hệ thống truyền động điện-cơ<br>- 6x Động cơ bước (M0 - M5)<br>- Chuyển điện năng thành cơ năng"]
+        
+        Platform["Cơ cấu Stewart Platform (6 DOF)<br>- Khớp nối (khớp cầu / các-đăng)<br>- 6 cơ cấu tay đòn - thanh truyền<br>- Bàn động (Platform) giả lập sóng"]
+        
+        Barge["Mô hình xà lan vật lý<br>- Đặt trên bàn động Stewart<br>- Đối tượng thử nghiệm thuật toán cân bằng"]
+    end
+
+    %% Mối liên kết giữa Điều khiển -> Điện
+    DMA_TIM -- "Xung logic STEP/DIR/EN (3.3V)" --> Drivers
+    MCU -- "Bus cấu hình SPI" --> Drivers
+    MCU -- "Tín hiệu bật nguồn chính (PE11)" --> PSU
+    
+    %% Mối liên kết giữa Điện -> Điều khiển
+    Sensors -- "Tín hiệu phản hồi hành trình (STOP)" --> Homing
+    Sensors -- "Tín hiệu ngắt khẩn (KILL)" --> Homing
+    PSU -- "Phát hiện mất nguồn (PWR_DET)" --> MCU
+
+    %% Mối liên kết giữa Điện -> Cơ khí
+    Drivers -- "Dòng điện động lực (12V/24V)" --> Motors
+    PSU -- "Cấp nguồn động lực" --> Drivers
+
+    %% Mối liên kết giữa Cơ khí -> Điện & Điều khiển
+    Motors -- "Mô-men xoắn (Trục quay)" --> Platform
+    Platform -- "Đồ gá & Liên kết vật lý" --> Barge
+    Platform -- "Tác động vật lý (chạm cữ)" --> Sensors
+        </div>
+    </div>
+    <footer>
+        <span>Đồ án tốt nghiệp - Hệ thống mô phỏng chuyển động xà lan</span>
+        <span>Kích thước bản vẽ: A3 Landscape (420mm x 297mm)</span>
+        <span>Sinh viên thực hiện: Nhóm Nghiên Cứu Stewart Platform</span>
+    </footer>
+</body>
+</html>
